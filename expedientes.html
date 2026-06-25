@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Expedientes – Motorcar</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size:13px;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ─── HEADER ─── */
+.hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#111;border-bottom:1px solid #1e1e1e;flex-shrink:0;height:50px}
+.back-btn{display:flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px 12px;cursor:pointer;color:#ccc;font-size:12px;font-weight:600;transition:all .15s;text-decoration:none}
+.back-btn:hover{background:#252525;color:#fff}
+.hdr-title{font-size:14px;font-weight:700;color:#fff;flex:1}
+.hdr-taller{display:flex;align-items:center;gap:6px;margin-right:4px}
+.taller-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.taller-badge.active-jm{background:#cc0000;color:#fff}
+.taller-badge.active-rm{background:#1e3a8a;color:#93c5fd}
+.taller-badge.inactive{background:#1a1a1a;color:#555;border:1px solid #2a2a2a}
+.reload-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;color:#666;font-size:16px;transition:all .15s}
+.reload-btn:hover{color:#ccc;background:#252525}
+.reload-btn.spin i{animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── FILTROS ─── */
+.filters{padding:10px 14px 8px;background:#0d0d0d;border-bottom:1px solid #161616;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.search-wrap{position:relative}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#444;font-size:15px;pointer-events:none}
+#searchInput{width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:8px 10px 8px 34px;color:#f0f0f0;font-size:12px;outline:none;transition:border-color .15s}
+#searchInput::placeholder{color:#444}
+#searchInput:focus{border-color:#555}
+.estado-filters{display:flex;gap:5px;flex-wrap:wrap}
+.ef-btn{font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;border:1px solid #2a2a2a;background:#1a1a1a;color:#555;transition:all .15s;white-space:nowrap}
+.ef-btn:hover{color:#ccc}
+.ef-btn.on{color:#fff;border-color:transparent}
+.ef-todos.on{background:#cc0000}
+.ef-pv.on{background:#14532d;color:#86efac}
+.ef-pa.on{background:#451a03;color:#fbbf24}
+.ef-pr.on{background:#1e3a8a;color:#93c5fd}
+.ef-pp.on{background:#4c1d95;color:#c4b5fd}
+.ef-pg.on{background:#1f2937;color:#9ca3af}
+.ef-pe.on{background:#3b0000;color:#fca5a5}
+
+/* ─── STATS ─── */
+.stats{display:flex;gap:8px;padding:8px 14px;background:#0d0d0d;border-bottom:1px solid #161616;flex-shrink:0}
+.stat-pill{display:flex;align-items:center;gap:5px;background:#161616;border:1px solid #222;border-radius:8px;padding:5px 10px;font-size:11px;color:#777}
+.stat-pill span{font-weight:700;color:#f0f0f0;font-size:13px}
+
+/* ─── LIST ─── */
+.list-wrap{flex:1;overflow-y:auto;padding:10px 12px 80px}
+.list-wrap::-webkit-scrollbar{width:4px}
+.list-wrap::-webkit-scrollbar-track{background:transparent}
+.list-wrap::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+
+.exp-card{background:#141414;border:1px solid #1e1e1e;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s;position:relative}
+.exp-card:hover{background:#1a1a1a;border-color:#2e2e2e;transform:translateX(2px)}
+.exp-card:active{transform:scale(.98)}
+.exp-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.exp-mat{font-size:15px;font-weight:800;color:#fff;letter-spacing:.5px}
+.exp-modelo{font-size:11px;color:#777;margin-top:1px}
+.pills{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.pill{font-size:9px;padding:2px 7px;border-radius:5px;white-space:nowrap;font-weight:600}
+.pv{background:#14532d;color:#86efac}
+.pa{background:#451a03;color:#fbbf24}
+.pr{background:#1e3a8a;color:#93c5fd}
+.pp{background:#4c1d95;color:#c4b5fd}
+.pg{background:#1f2937;color:#9ca3af}
+.pe{background:#3b0000;color:#fca5a5}
+.pt-jm{background:#3b0000;color:#fca5a5}
+.pt-rm{background:#1e3a8a;color:#93c5fd}
+.exp-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.exp-meta-item{display:flex;align-items:center;gap:3px;font-size:10px;color:#555}
+.exp-meta-item i{font-size:12px}
+.exp-meta-item b{color:#999;font-weight:500}
+.exp-or{font-size:10px;color:#444;margin-top:4px}
+
+/* ─── SPINNER / EMPTY ─── */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 20px;color:#444}
+.loading i{font-size:36px;animation:spin .7s linear infinite;color:#cc0000}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:60px 20px;color:#444;text-align:center}
+.empty i{font-size:40px;color:#2a2a2a}
+.empty p{font-size:12px;max-width:220px;line-height:1.6}
+
+/* ─── DETAIL PANEL ─── */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;display:flex;align-items:flex-end}
+.detail-overlay.open{opacity:1;pointer-events:all}
+.detail-panel{background:#141414;border:1px solid #2a2a2a;border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;transform:translateY(20px);transition:transform .2s;display:flex;flex-direction:column}
+.detail-overlay.open .detail-panel{transform:translateY(0)}
+.detail-panel::-webkit-scrollbar{width:4px}
+.detail-panel::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+
+.dp-handle{width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:10px auto 4px;flex-shrink:0}
+.dp-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:4px 16px 12px;border-bottom:1px solid #1e1e1e;flex-shrink:0}
+.dp-mat{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px}
+.dp-modelo{font-size:12px;color:#666;margin-top:2px}
+.dp-close{background:none;border:none;color:#444;font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px}
+.dp-close:hover{color:#ccc}
+.dp-body{padding:14px 16px 30px}
+
+.dp-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.dp-section{margin-bottom:16px}
+.dp-section-title{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.dp-section-title i{font-size:13px}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dp-field{background:#1a1a1a;border-radius:8px;padding:8px 10px}
+.dp-field-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.dp-field-val{font-size:12px;color:#e0e0e0;font-weight:500;word-break:break-word}
+.dp-field-val.highlight{color:#fff;font-weight:700}
+.dp-field-val.empty-val{color:#333;font-style:italic}
+.dp-field.full{grid-column:1/-1}
+
+.link-btn{display:flex;align-items:center;gap:8px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:9px 12px;text-decoration:none;color:#ccc;font-size:12px;font-weight:500;transition:all .15s;margin-bottom:6px}
+.link-btn:hover{background:#222;border-color:#444;color:#fff}
+.link-btn i{font-size:18px;flex-shrink:0}
+.link-btn.trello{border-color:#0052cc33;color:#579dff}
+.link-btn.trello:hover{background:#0f1b2d;border-color:#579dff55}
+.link-btn.drive{border-color:#34a85333;color:#34a853}
+.link-btn.drive:hover{background:#0d1f15;border-color:#34a85388}
+.link-btn.doc{border-color:#4285f433;color:#4285f4}
+.link-btn.doc:hover{background:#0d1626;border-color:#4285f488}
+
+.rec-item{background:#1a1a1a;border-radius:8px;padding:9px 11px;margin-bottom:5px;border-left:3px solid #2a2a2a}
+.rec-item.est-pv{border-left-color:#22c55e}
+.rec-item.est-pa{border-left-color:#f59e0b}
+.rec-item.est-pe{border-left-color:#ef4444}
+.rec-item.est-pr{border-left-color:#3b82f6}
+.rec-desc{font-size:12px;color:#e0e0e0;font-weight:500;margin-bottom:4px}
+.rec-meta{display:flex;gap:8px;flex-wrap:wrap}
+.rec-meta span{font-size:10px;color:#555;display:flex;align-items:center;gap:3px}
+.rec-meta span i{font-size:11px}
+.rec-meta span b{color:#888}
+.rec-empty{font-size:11px;color:#333;text-align:center;padding:12px;background:#141414;border-radius:8px}
+
+/* ─── MOBILE BOTTOM SAFE AREA ─── */
+@media (max-width: 600px) {
+  .detail-panel{max-height:92vh}
+  .dp-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <a class="back-btn" onclick="goBack()" href="javascript:void(0)">
+    <i class="ti ti-arrow-left"></i> Volver
+  </a>
+  <span class="hdr-title"><i class="ti ti-folder-open" style="margin-right:5px;color:#cc0000"></i>Expedientes</span>
+  <div class="hdr-taller">
+    <span class="taller-badge active-jm" id="btnJM" onclick="setTaller('JM')">JM</span>
+    <span class="taller-badge inactive" id="btnRM" onclick="setTaller('RM')">RM</span>
+    <span class="taller-badge inactive" id="btnTodos" onclick="setTaller('TODOS')">TODOS</span>
+  </div>
+  <div class="reload-btn" id="reloadBtn" onclick="loadAll()" title="Recargar datos">
+    <i class="ti ti-refresh"></i>
+  </div>
+</div>
+
+<!-- FILTROS -->
+<div class="filters">
+  <div class="search-wrap">
+    <i class="ti ti-search"></i>
+    <input id="searchInput" type="search" placeholder="Buscar matrícula, modelo, operario…" oninput="renderList()">
+  </div>
+  <div class="estado-filters">
+    <button class="ef-btn ef-todos on" onclick="setEstado('TODOS',this)">Todos</button>
+    <button class="ef-btn ef-pv" onclick="setEstado('TERMINADO',this)">Terminado</button>
+    <button class="ef-btn ef-pa" onclick="setEstado('EN PROCESO',this)">En proceso</button>
+    <button class="ef-btn ef-pr" onclick="setEstado('PENDIENTE',this)">Pendiente</button>
+    <button class="ef-btn ef-pp" onclick="setEstado('PRESUPUESTO',this)">Presupuesto</button>
+    <button class="ef-btn ef-pe" onclick="setEstado('ENTREGADO',this)">Entregado</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats" id="statsBar">
+  <div class="stat-pill"><i class="ti ti-car"></i><span id="statTotal">–</span> coches</div>
+  <div class="stat-pill"><i class="ti ti-tool" style="color:#f59e0b"></i><span id="statActivos">–</span> activos</div>
+  <div class="stat-pill"><i class="ti ti-package" style="color:#3b82f6"></i><span id="statRecambios">–</span> recambios</div>
+</div>
+
+<!-- LIST -->
+<div class="list-wrap" id="listWrap">
+  <div class="loading"><i class="ti ti-loader"></i><span>Cargando expedientes…</span></div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detailPanel">
+    <div class="dp-handle"></div>
+    <div class="dp-hdr">
+      <div>
+        <div class="dp-mat" id="dpMat">—</div>
+        <div class="dp-modelo" id="dpModelo"></div>
+      </div>
+      <button class="dp-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="dp-body" id="dpBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+const API_KEY = 'AIzaSyDS855T1-C6AGB-Jhifb-cydpI20V3zxWY';
+
+const SID = {
+  EXP:     '1Rx4oNjzORTqqYicC5dp-k1ZJShXCG63ouGMT8k8lYAM',  // Expedientes
+  REC_JM:  '1XNq2gcGIqX47KZ_1jOVzLaqkEKLN3BotOua9J-IIxa4',  // Recambios MOTORCAR – tab JOAN Motorcar
+  REC_RM:  '1XNq2gcGIqX47KZ_1jOVzLaqkEKLN3BotOua9J-IIxa4',  // mismo sheet, tab RM
+  PED_JM:  '1d4SGCIXYgmWXsvEbZWTu4LaJq3l08DwpdnscPD0DmW8',  // Pedidos JM
+  PED_RM:  '1d4SGCIXYgmWXsvEbZWTu4LaJq3l08DwpdnscPD0DmW8',  // Pedidos RM
+};
+
+const TRELLO_BOARDS = { JM: 'r2eSFTPp', RM: 'yU3BGeVY' };
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let allExp    = [];   // [{col:val, ...}, ...]
+let allRec    = [];   // recambios
+let allPed    = [];   // pedidos
+let tallerFlt = 'JM';   // will be overridden by detectParentTaller()
+let estadoFlt = 'TODOS';
+let expHeaders = [];
+let recHeaders = [];
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function goBack() {
+  try { window.parent.closeApp(); } catch(e) { history.back(); }
+}
+
+// ═══════════════════════════════════════════
+//  SHEETS API
+// ═══════════════════════════════════════════
+async function fetchSheet(sheetId, range) {
+  const enc = encodeURIComponent(range);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${enc}?key=${API_KEY}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status} – ${range}`);
+  const j = await r.json();
+  return j.values || [];
+}
+
+function parseRows(rows) {
+  if (!rows.length) return { headers: [], data: [] };
+  const headers = rows[0].map(h => (h||'').toString().trim().toUpperCase());
+  const data = rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (row[i] || '').toString().trim(); });
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));  // skip empty rows
+  return { headers, data };
+}
+
+function col(obj, ...names) {
+  for (const n of names) {
+    const v = obj[n.toUpperCase()];
+    if (v) return v;
+  }
+  return '';
+}
+
+// ═══════════════════════════════════════════
+//  LOAD
+// ═══════════════════════════════════════════
+async function loadAll() {
+  const btn = document.getElementById('reloadBtn');
+  btn.classList.add('spin');
+  setListHTML(`<div class="loading"><i class="ti ti-loader"></i><span>Cargando datos…</span></div>`);
+
+  try {
+    const [expRows, recJMRows, recRMRows, pedJMRows, pedRMRows] = await Promise.allSettled([
+      fetchSheet(SID.EXP,    'Hoja 1!A:Z'),
+      fetchSheet(SID.REC_JM, 'JOAN Motorcar!A:Z'),
+      fetchSheet(SID.REC_RM, 'Raul Motorcar!A:Z').catch(() => fetchSheet(SID.REC_RM, 'Hoja 2!A:Z').catch(() => [])),
+      fetchSheet(SID.PED_JM, 'Pedidos JM!A:Z').catch(() => []),
+      fetchSheet(SID.PED_RM, 'Pedidos RM!A:Z').catch(() => []),
+    ]);
+
+    const expP   = parseRows(expRows.status   === 'fulfilled' ? expRows.value   : []);
+    const recJMP = parseRows(recJMRows.status === 'fulfilled' ? recJMRows.value : []);
+    const recRMP = parseRows(recRMRows.status === 'fulfilled' ? (Array.isArray(recRMRows.value) ? recRMRows.value : []) : []);
+    const pedJMP = parseRows(pedJMRows.status === 'fulfilled' ? pedJMRows.value : []);
+    const pedRMP = parseRows(pedRMRows.status === 'fulfilled' ? pedRMRows.value : []);
+
+    expHeaders = expP.headers;
+    recHeaders = recJMP.headers.length ? recJMP.headers : recRMP.headers;
+
+    allExp  = expP.data;
+    // Tag recambios with taller
+    allRec  = [
+      ...recJMP.data.map(r => ({...r, _TALLER:'JM'})),
+      ...recRMP.data.map(r => ({...r, _TALLER:'RM'})),
+    ];
+    allPed  = [
+      ...pedJMP.data.map(r => ({...r, _TALLER:'JM'})),
+      ...pedRMP.data.map(r => ({...r, _TALLER:'RM'})),
+    ];
+
+    updateStats();
+    renderList();
+  } catch(e) {
+    setListHTML(`<div class="empty"><i class="ti ti-wifi-off"></i><p>Error cargando datos.<br>${e.message}</p></div>`);
+  } finally {
+    btn.classList.remove('spin');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  FILTERS
+// ═══════════════════════════════════════════
+function setTaller(t) {
+  tallerFlt = t;
+  document.getElementById('btnJM').className   = 'taller-badge ' + (t==='JM'    ? 'active-jm' : 'inactive');
+  document.getElementById('btnRM').className   = 'taller-badge ' + (t==='RM'    ? 'active-rm' : 'inactive');
+  document.getElementById('btnTodos').className= 'taller-badge ' + (t==='TODOS' ? 'active-jm' : 'inactive');
+  if (allExp.length) { updateStats(); renderList(); }
+}
+
+function setEstado(e, btn) {
+  estadoFlt = e;
+  document.querySelectorAll('.ef-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderList();
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  return allExp.filter(r => {
+    const taller = col(r, 'TALLER', 'TALLER JM', 'TALLER/RM');
+    // If the row has no TALLER column, include it only when tallerFlt matches the _implicit taller
+    if (tallerFlt !== 'TODOS') {
+      if (taller && taller.toUpperCase() !== tallerFlt) return false;
+      // rows with no TALLER value: only show when taller matches the implicit sheet taller (_TALLER tag)
+      if (!taller && r._TALLER && r._TALLER !== tallerFlt) return false;
+    }
+    if (false) return false;  // placeholder kept for structure
+    if (estadoFlt !== 'TODOS') {
+      const est = col(r,'ESTADO','ESTADO EXPEDIENTE','STATUS');
+      if (!est.toUpperCase().includes(estadoFlt)) return false;
+    }
+    if (q) {
+      const hay = [
+        col(r,'MATRICULA','MATRÍCULA'),
+        col(r,'MARCA','MODELO','MARCA/MODELO','MARCA / MODELO'),
+        col(r,'OPERARIO','OPERARIO ASIGNADO'),
+        col(r,'OR','NUM OR','NÚMERO OR','Nº OR'),
+        col(r,'PROPIETARIO','CLIENTE'),
+      ].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+// ═══════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════
+function updateStats() {
+  // Stats scoped to active taller filter
+  const visibleExp = tallerFlt === 'TODOS' ? allExp : allExp.filter(r => {
+    const t = col(r,'TALLER');
+    return !t || t.toUpperCase() === tallerFlt;
+  });
+  const visibleRec = tallerFlt === 'TODOS' ? allRec : allRec.filter(r => r._TALLER === tallerFlt);
+
+  document.getElementById('statTotal').textContent = visibleExp.length;
+  const activos = visibleExp.filter(r => {
+    const e = col(r,'ESTADO','STATUS').toUpperCase();
+    return e.includes('PROCESO') || e.includes('PENDIENTE') || e.includes('EN TALLER');
+  }).length;
+  document.getElementById('statActivos').textContent = activos;
+  document.getElementById('statRecambios').textContent = visibleRec.length;
+}
+
+// ═══════════════════════════════════════════
+//  RENDER LIST
+// ═══════════════════════════════════════════
+function estadoPill(est) {
+  if (!est) return '';
+  const u = est.toUpperCase();
+  let cls = 'pg';
+  if (u.includes('TERMINADO') || u.includes('LISTO'))         cls='pv';
+  else if (u.includes('PROCESO') || u.includes('TALLER'))     cls='pa';
+  else if (u.includes('PENDIENTE') || u.includes('ESPERA'))   cls='pr';
+  else if (u.includes('PRESUPUESTO') || u.includes('PERIT'))  cls='pp';
+  else if (u.includes('ENTREGADO'))                           cls='pe';
+  return `<span class="pill ${cls}">${est}</span>`;
+}
+
+function tallerPill(t) {
+  if (!t) return '';
+  const u = t.toUpperCase();
+  const cls = u==='JM' ? 'pt-jm' : u==='RM' ? 'pt-rm' : 'pg';
+  return `<span class="pill ${cls}">${t}</span>`;
+}
+
+function renderList() {
+  const items = getFiltered();
+  if (!items.length) {
+    setListHTML(`<div class="empty"><i class="ti ti-folder-x"></i><p>Sin resultados con los filtros actuales</p></div>`);
+    return;
+  }
+
+  let html = '';
+  for (const r of items) {
+    const mat    = col(r,'MATRICULA','MATRÍCULA') || '—';
+    const modelo = col(r,'MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO') || '';
+    const or     = col(r,'OR','NUM OR','Nº OR','NÚMERO OR','OR_NUM');
+    const taller = col(r,'TALLER');
+    const estado = col(r,'ESTADO','STATUS','ESTADO EXPEDIENTE');
+    const fase   = col(r,'FASE','FASE REPARACION','FASE REPARACIÓN');
+    const oper   = col(r,'OPERARIO','OPERARIO ASIGNADO');
+    const fEnt   = col(r,'FECHA ENTRADA','FECHA APERTURA','F.ENTRADA','FECHA DE ENTRADA');
+    const fPrev  = col(r,'FECHA PREVISTA','FECHA PREVISTA ENTREGA','F.ENTREGA','FECHA ENTREGA PREVISTA');
+
+    // Count recambios for this car
+    const recCount = allRec.filter(rec => {
+      const rm = col(rec,'MATRICULA','MATRÍCULA','OR');
+      return rm && (rm === mat || rm === or);
+    }).length;
+
+    html += `<div class="exp-card" onclick='openDetail(${JSON.stringify({mat,modelo,or,taller,estado,fase,oper,fEnt,fPrev,_raw:JSON.stringify(r)})})'>
+      <div class="exp-top">
+        <div>
+          <div class="exp-mat">${mat}</div>
+          ${modelo ? `<div class="exp-modelo">${modelo}</div>` : ''}
+        </div>
+        <div class="pills">
+          ${tallerPill(taller)}
+          ${estadoPill(estado)}
+          ${fase ? `<span class="pill pg">${fase}</span>` : ''}
+        </div>
+      </div>
+      <div class="exp-meta">
+        ${oper   ? `<span class="exp-meta-item"><i class="ti ti-user"></i><b>${oper}</b></span>` : ''}
+        ${fEnt   ? `<span class="exp-meta-item"><i class="ti ti-calendar-event"></i>${fEnt}</span>` : ''}
+        ${fPrev  ? `<span class="exp-meta-item"><i class="ti ti-calendar-check"></i>${fPrev}</span>` : ''}
+        ${recCount ? `<span class="exp-meta-item" style="color:#3b82f6"><i class="ti ti-package"></i>${recCount} recambios</span>` : ''}
+      </div>
+      ${or ? `<div class="exp-or">OR: ${or}</div>` : ''}
+    </div>`;
+  }
+  setListHTML(html);
+}
+
+function setListHTML(h) {
+  document.getElementById('listWrap').innerHTML = h;
+}
+
+// ═══════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════
+function openDetail(data) {
+  if (typeof data === 'string') data = JSON.parse(data);
+  const raw = data._raw ? JSON.parse(data._raw) : {};
+
+  document.getElementById('dpMat').textContent    = data.mat || '—';
+  document.getElementById('dpModelo').textContent = data.modelo || '';
+
+  // Build body
+  let html = '';
+
+  // Pills
+  html += `<div class="dp-pills">
+    ${tallerPill(data.taller)}
+    ${estadoPill(data.estado)}
+    ${data.fase ? `<span class="pill pg">${data.fase}</span>` : ''}
+  </div>`;
+
+  // Datos clave
+  html += `<div class="dp-section">
+    <div class="dp-section-title"><i class="ti ti-info-circle"></i>Información</div>
+    <div class="dp-grid">`;
+
+  const fields = [
+    ['OR / Orden',      col(raw,'OR','NUM OR','Nº OR','NÚMERO OR')],
+    ['Operario',        col(raw,'OPERARIO','OPERARIO ASIGNADO')],
+    ['Propietario',     col(raw,'PROPIETARIO','CLIENTE','NOMBRE')],
+    ['Matrícula',       data.mat],
+    ['Fecha entrada',   col(raw,'FECHA ENTRADA','FECHA APERTURA','F.ENTRADA')],
+    ['Entrega prevista',col(raw,'FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA')],
+    ['VIN / Bastidor',  col(raw,'VIN','BASTIDOR','VIN/BASTIDOR')],
+    ['Km',              col(raw,'KM','KILÓMETROS','KILOMETROS')],
+    ['Seguro / Peritación', col(raw,'SEGURO','ASEGURADORA','PERITACION','PERITACIÓN')],
+    ['Observaciones',   col(raw,'OBSERVACIONES','NOTAS','OBS')],
+  ];
+
+  for (const [label, val] of fields) {
+    if (!val) continue;
+    const isLong = val.length > 30;
+    html += `<div class="dp-field ${isLong?'full':''}">
+      <div class="dp-field-label">${label}</div>
+      <div class="dp-field-val">${val}</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // Links
+  const linkOR    = col(raw,'LINK OR','LINK_OR','ENLACE OR');
+  const linkDrive = col(raw,'LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK CARPETA DRIVE','LINK_CARPETA_DRIVE');
+  const linkPer   = col(raw,'LINK PERITACION','LINK_PERITACION','PERITACIÓN LINK','ENLACE PERITACION');
+  const fotosAlb  = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN');
+  const trelloCardId = extractTrelloId(fotosAlb);
+
+  if (linkOR || linkDrive || linkPer || trelloCardId || data.taller) {
+    html += `<div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-link"></i>Accesos directos</div>`;
+
+    if (trelloCardId) {
+      html += `<a class="link-btn trello" href="https://trello.com/c/${trelloCardId}" target="_blank">
+        <i class="ti ti-brand-trello"></i>
+        Ver tarjeta Trello
+      </a>`;
+    } else if (data.taller) {
+      const bId = TRELLO_BOARDS[data.taller.toUpperCase()] || (data.taller.toUpperCase()==='JM' ? TRELLO_BOARDS.JM : TRELLO_BOARDS.RM);
+      if (bId) html += `<a class="link-btn trello" href="https://trello.com/b/${bId}" target="_blank">
+        <i class="ti ti-brand-trello"></i>
+        Tablero Trello ${data.taller.toUpperCase()}
+      </a>`;
+    }
+
+    if (linkDrive) html += `<a class="link-btn drive" href="${linkDrive}" target="_blank">
+      <i class="ti ti-brand-google-drive"></i>Carpeta Drive</a>`;
+    if (linkOR) html += `<a class="link-btn doc" href="${linkOR}" target="_blank">
+      <i class="ti ti-file-description"></i>Orden de Reparación</a>`;
+    if (linkPer) html += `<a class="link-btn doc" href="${linkPer}" target="_blank">
+      <i class="ti ti-file-invoice"></i>Peritación</a>`;
+
+    html += `</div>`;
+  }
+
+  // Recambios
+  const recForCar = allRec.filter(rec => {
+    const rm = col(rec,'MATRICULA','MATRÍCULA','OR','MATRICULA/OR');
+    return rm && (rm.toUpperCase() === data.mat.toUpperCase() || rm === col(raw,'OR','NUM OR'));
+  });
+
+  html += `<div class="dp-section">
+    <div class="dp-section-title"><i class="ti ti-package"></i>Recambios (${recForCar.length})</div>`;
+
+  if (!recForCar.length) {
+    html += `<div class="rec-empty">Sin recambios registrados para este expediente</div>`;
+  } else {
+    for (const rc of recForCar) {
+      const desc = col(rc,'DESCRIPCION','DESCRIPCIÓN','ARTICULO','ARTÍCULO','PIEZA','REFERENCIA','REF');
+      const ref  = col(rc,'REFERENCIA','REF','CÓDIGO','CODIGO');
+      const prov = col(rc,'PROVEEDOR','PROVEEDOR/A');
+      const est  = col(rc,'ESTADO','STATUS');
+      const fPed = col(rc,'FECHA PEDIDO','F.PEDIDO');
+      const fLleg= col(rc,'FECHA LLEGADA','FECHA RECEPCION','FECHA RECEPCIÓN','F.LLEGADA');
+      const cant = col(rc,'CANTIDAD','CANT','UNIDADES');
+      const alb  = col(rc,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN');
+      const trcId= extractTrelloId(alb);
+
+      let estCls = '';
+      if (est) {
+        const eu = est.toUpperCase();
+        if (eu.includes('LLEG') || eu.includes('RECIB') || eu.includes('OK'))       estCls='est-pv';
+        else if (eu.includes('PEDIDO') || eu.includes('ESPERA'))                    estCls='est-pa';
+        else if (eu.includes('FALTA') || eu.includes('URGENTE'))                    estCls='est-pe';
+        else if (eu.includes('DEVOL') || eu.includes('INCIDENCIA'))                 estCls='est-pr';
+      }
+
+      html += `<div class="rec-item ${estCls}">
+        <div class="rec-desc">${desc || ref || 'Recambio sin descripción'}</div>
+        <div class="rec-meta">
+          ${ref && ref!==desc ? `<span><i class="ti ti-hash"></i><b>${ref}</b></span>` : ''}
+          ${cant  ? `<span><i class="ti ti-number"></i><b>${cant}</b></span>` : ''}
+          ${prov  ? `<span><i class="ti ti-building-store"></i><b>${prov}</b></span>` : ''}
+          ${est   ? `<span><i class="ti ti-circle-dot"></i><b>${est}</b></span>` : ''}
+          ${fPed  ? `<span><i class="ti ti-calendar-plus"></i>${fPed}</span>` : ''}
+          ${fLleg ? `<span><i class="ti ti-calendar-check"></i>${fLleg}</span>` : ''}
+          ${trcId ? `<span><a href="https://trello.com/c/${trcId}" target="_blank" style="color:#579dff;text-decoration:none;display:flex;align-items:center;gap:3px"><i class="ti ti-brand-trello"></i>Trello</a></span>` : ''}
+        </div>
+      </div>`;
+    }
+  }
+  html += `</div>`;
+
+  // Pedidos
+  const pedForCar = allPed.filter(p => {
+    const pm = col(p,'MATRICULA','MATRÍCULA','OR');
+    return pm && (pm.toUpperCase() === data.mat.toUpperCase() || pm === col(raw,'OR','NUM OR'));
+  });
+
+  if (pedForCar.length) {
+    html += `<div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-truck-delivery"></i>Pedidos (${pedForCar.length})</div>`;
+    for (const p of pedForCar) {
+      const desc = col(p,'DESCRIPCION','DESCRIPCIÓN','ARTICULO','PIEZA','REFERENCIA');
+      const est  = col(p,'ESTADO','STATUS');
+      const prov = col(p,'PROVEEDOR');
+      const fPed = col(p,'FECHA','FECHA PEDIDO');
+      html += `<div class="rec-item">
+        <div class="rec-desc">${desc || 'Pedido'}</div>
+        <div class="rec-meta">
+          ${prov ? `<span><i class="ti ti-building-store"></i><b>${prov}</b></span>` : ''}
+          ${est  ? `<span><i class="ti ti-circle-dot"></i><b>${est}</b></span>` : ''}
+          ${fPed ? `<span><i class="ti ti-calendar-plus"></i>${fPed}</span>` : ''}
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // All raw fields (collapsible)
+  const skip = new Set(['OR','MODELO','TALLER','ESTADO','FASE','OPERARIO','MATRICULA','MATRÍCULA',
+    'MARCA','MARCA/MODELO','PROPIETARIO','FECHA ENTRADA','FECHA PREVISTA ENTREGA','VIN','KM',
+    'LINK OR','LINK_OR','LINK CARPETA','LINK_CARPETA','LINK_CARPETA_DRIVE','LINK PERITACION',
+    'FOTO_ALBARAN','FOTO ALBARAN','BASTIDOR']);
+  const extras = Object.entries(raw).filter(([k,v]) => v && !skip.has(k));
+
+  if (extras.length) {
+    html += `<div class="dp-section">
+      <div class="dp-section-title" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none'">
+        <i class="ti ti-dots"></i>Más campos <i class="ti ti-chevron-down" style="margin-left:auto;font-size:11px"></i>
+      </div>
+      <div class="dp-grid" style="display:none">`;
+    for (const [k,v] of extras) {
+      html += `<div class="dp-field"><div class="dp-field-label">${k}</div><div class="dp-field-val" style="font-size:11px">${v}</div></div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  document.getElementById('dpBody').innerHTML = html;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetail(e) {
+  if (e && e.target !== document.getElementById('detailOverlay')) return;
+  document.getElementById('detailOverlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════
+//  TALLER AUTO-DETECT FROM PARENT APP
+// ═══════════════════════════════════════════
+function detectParentTaller() {
+  try {
+    // Read the taller name from the parent dashboard topbar
+    const el = window.parent.document.getElementById('tallerName');
+    if (el) {
+      const txt = el.textContent.toUpperCase();
+      if (txt.includes('RAUL') || txt.includes('RAULM') || txt.includes('RM')) return 'RM';
+      return 'JM';
+    }
+  } catch(e) { /* cross-origin or standalone */ }
+  // Fallback: try URL param ?taller=RM
+  const p = new URLSearchParams(window.location.search).get('taller');
+  if (p) return p.toUpperCase();
+  return 'JM';
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function extractTrelloId(url) {
+  if (!url) return null;
+  // https://trello.com/1/cards/{cardId}/attachments/...
+  const m = url.match(/trello\.com\/(?:1\/)?cards\/([a-zA-Z0-9]+)/);
+  if (m) return m[1];
+  // https://trello.com/c/{cardId}
+  const m2 = url.match(/trello\.com\/c\/([a-zA-Z0-9]+)/);
+  return m2 ? m2[1] : null;
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+// Auto-detect which taller is active in the parent dashboard
+tallerFlt = detectParentTaller();
+setTaller(tallerFlt);   // update button styles immediately
+loadAll();
+</script>
+</body>
+</html>
