@@ -462,8 +462,8 @@ const EXP_TABS = {
 };
 
 const TRELLO_BOARDS = { JM: 'r2eSFTPp', RM: 'yU3BGeVY' };
-const TRELLO_KEY   = 'd33f77576a9263e3f102d76c4a1bdaca';
-const TRELLO_TOKEN = '42a3e02a6e927cbe746211eb323c6f00eefb120aad49897b945e3f793eed94a8';
+const TRELLO_KEY   = 'e67eba95b0951a57ef1f8b24ce1f1f8c';
+const TRELLO_TOKEN = 'ATTAedce8489773aa2cfefd78c73ebca29e7d0dc8801bbfdd40acb9906bbf041457553A55F7A';
 
 // Sheet CITAS — horas presupuestadas, operario, datos cliente
 const SID_CITAS = '1lX1AEAFYxdecI4XtZnQaBack7Ocb-4u8qlb0pEsQz1g';
@@ -931,28 +931,42 @@ function _openDetail(rawArg, editModeOverride) {
   const FASES   = ['Peritación','Chapa','Pintura','Montaje','Control calidad','Mecánica','Entrega','Facturación'];
 
   // ── Variables derivadas (usadas en múltiples secciones) ──
-  const fotosAlb     = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO');
-  const trelloCardId = extractTrelloId(fotosAlb);
-  const _orUP2  = orNum.toUpperCase().replace(/\s/g,'');
-  const _matUP2 = mat.replace(/[-\s]/g,'').toUpperCase();
+  const fotosAlb = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO');
+  const _orUP2   = orNum.toUpperCase().replace(/\s/g,'');
+  const _matUP2  = mat.replace(/[-\s]/g,'').toUpperCase();
+
+  // Buscar CITAS por OR o matrícula (los más fiables)
   const cita = allCitas.find(c => {
-    const cOr     = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
-    const cMat    = (c['Matrícula'] || c['MATRICULA'] || '').replace(/[-\s]/g,'').toUpperCase();
-    const cTrello = (c['Trello Card ID'] || '').trim();
+    const cOr  = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
+    const cMat = (c['Matrícula'] || c['MATRICULA'] || '').replace(/[-\s]/g,'').toUpperCase();
     if (_orUP2  && cOr  && cOr  === _orUP2)  return true;
     if (_matUP2 && cMat && cMat === _matUP2)  return true;
-    if (cTrello && trelloCardId && cTrello === trelloCardId) return true;
     return false;
   });
 
+  // Trello Card ID: primero del link en EXP, luego del ID directo en CITAS
+  // (CITAS guarda el ID hex largo de 24 chars, válido para la API de Trello)
+  const trelloCardIdFromCitas = cita ? (cita['Trello Card ID'] || '').trim() : '';
+  const trelloCardId = extractTrelloId(fotosAlb) || trelloCardIdFromCitas || null;
+
   // ── SECCIÓN 1: Estado actual ──────────────────
+  const citaEstado  = cita ? (cita['Estado'] || '') : '';
+  const citaSemana  = cita ? (cita['Semana'] || '') : '';
+  const citaRecamb  = cita ? (cita['Recambios'] || '') : '';
+  const citaNota    = cita ? (cita['Nota'] || '') : '';
+  const semanaFmt   = citaSemana ? citaSemana.replace(/(\d{4})-W(\d+)/, 'Sem.$2 · $1') : '';
+  const tieneRecamb = citaRecamb && citaRecamb.toUpperCase() !== 'FALSE' && citaRecamb !== '0';
   const estadoHtml = `
     <div class="ds-grid">
       ${df('Taller', taller ? tallerPill(taller) : '', {highlight: !!taller})}
       ${df('Estado', estado ? estadoPill(estado) : '', {showEmpty: true, field:'ESTADO', select: ESTADOS})}
       ${df('Fase actual', fase||'', {showEmpty:!!isEditMode, field:'FASE TALLER', select: FASES})}
       ${df('Operario asignado', oper||'', {showEmpty:!!isEditMode, field:'OPERARIO ASIGNADO'})}
-    </div>`;
+      ${citaEstado ? df('Estado cita', `<span style="text-transform:capitalize;color:#93c5fd">${citaEstado}</span>`) : ''}
+      ${semanaFmt  ? df('Semana asignada', semanaFmt) : ''}
+      ${tieneRecamb ? df('Recambios', '<span style="color:#f97316;font-weight:700"><i class="ti ti-package" style="margin-right:3px"></i>Pendientes</span>') : ''}
+    </div>
+    ${citaNota ? `<div style="margin-top:6px;padding:6px 10px;background:#0a1628;border-left:2px solid #3b82f6;border-radius:0 6px 6px 0;font-size:11px;color:#93c5fd"><i class="ti ti-notes" style="margin-right:4px"></i>${citaNota}</div>` : ''}`;
   html += section('ti-dashboard', 'Estado actual', estadoHtml);
 
   // ── SECCIÓN 2: Trello & documentos ───────────
@@ -1477,13 +1491,15 @@ function renderTrello(card) {
   if (card.desc && card.desc.trim()) {
     const desc = card.desc;
 
-    // Cliente: busca "Cliente: Nombre" o "Propietario: Nombre" o primera línea de texto puro
+    // Cliente: busca "Nombre Cliente: X", "Cliente: X", "Propietario: X"
+    // Formato Motorcar: "Nombre Cliente: MARIA ANTONIA JANER"
     let trelloCliente = '';
-    const clienteMatch = desc.match(/(?:cliente|propietario|owner|nombre|name)[:\s]+([^\n·|,\d@]{3,50})/i);
+    // Primero busca el patrón específico "Nombre Cliente:" o "Cliente:" seguido del nombre
+    const clienteMatch = desc.match(/(?:nombre\s+cliente|cliente|propietario|owner)\s*:\s*([^\n·|,@\d][^\n·|,@]{1,50})/i);
     if (clienteMatch) {
       trelloCliente = clienteMatch[1].trim().replace(/\s+/g,' ');
     } else {
-      // Fallback: primera línea con letras (no URL, no fecha, no teléfono, no email)
+      // Fallback: primera línea con solo letras y espacios
       const firstLine = desc.split('\n').map(l=>l.trim()).find(l =>
         l && l.length >= 4 && l.length <= 50 &&
         /^[A-Za-zÀ-ÿ\s]{4,50}$/.test(l) &&
@@ -1492,9 +1508,10 @@ function renderTrello(card) {
       if (firstLine) trelloCliente = firstLine;
     }
 
-    // Teléfono: número español 9 dígitos
-    const telMatch = desc.match(/(\+?(?:34[\s\-.]?)?[6789]\d[\s\-.]?\d{2}[\s\-.]?\d{2}[\s\-.]?\d{2}[\s\-.]?\d{2})/);
-    const trelloTel = telMatch ? telMatch[1].replace(/[\s\-.]/g,'').replace(/^0034/,'34') : '';
+    // Teléfono español: 9 dígitos empezando por 6,7,8,9 — con o sin prefijo +34
+    // Formato Motorcar: "Teléfono Cliente: 649760723"
+    const telMatch = desc.match(/(?:tel[eé]fono[^:]*:\s*)?(\+?(?:0034|34)?[\s\-.]?[6789]\d{8})/i);
+    const trelloTel = telMatch ? telMatch[1].replace(/[\s\-.]/g,'').replace(/^(?:\+?0034|\+34)/,'34') : '';
 
     // Email
     const emailMatch = desc.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
