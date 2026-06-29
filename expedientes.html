@@ -41,21 +41,21 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 .df-back{display:flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px 12px;cursor:pointer;color:#ccc;font-size:12px;font-weight:600}
 .df-back:hover{background:#252525;color:#fff}
 .df-mat{font-size:14px;font-weight:900;color:#fff;letter-spacing:.5px}
-.df-modelo{font-size:11px;color:#555}
+.df-modelo{font-size:11px;color:#9ca3af}
 .detail-full-body{flex:1;overflow-y:auto;padding:12px 14px 60px}
 .detail-full-body::-webkit-scrollbar{width:4px}
 .detail-full-body::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
 
 /* ─── DETAIL SECTIONS ─── */
-.ds{margin-bottom:14px}
-.ds-title{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:flex;align-items:center;gap:5px;padding-bottom:5px;border-bottom:1px solid #161616}
+.ds{margin-bottom:10px}
+.ds-title{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:5px;padding-bottom:4px;border-bottom:1px solid #1e1e1e}
 .ds-title i{font-size:13px;color:#666}
 .ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .ds-grid.cols3{grid-template-columns:1fr 1fr 1fr}
 .df{background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:8px 10px}
 .df.full{grid-column:1/-1}
 .df.highlight{border-color:#cc0000}
-.df-label{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.df-label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
 .df-val{font-size:12px;color:#e0e0e0;font-weight:500;word-break:break-word;line-height:1.4}
 .df-val.big{font-size:15px;font-weight:800;color:#fff}
 .df-val.empty{color:#2a2a2a;font-style:italic;font-size:11px}
@@ -72,7 +72,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 .date-dot.red{background:#ef4444}
 .date-dot.blue{background:#3b82f6}
 .date-dot.grey{background:#374151}
-.date-label{font-size:10px;color:#555;min-width:140px}
+.date-label{font-size:10px;color:#999;min-width:130px}
 .date-val{font-size:12px;color:#e0e0e0;font-weight:600;margin-left:auto}
 .date-val.empty{color:#2a2a2a;font-style:italic;font-weight:400}
 
@@ -98,7 +98,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 .rec-row.info{border-left-color:#3b82f6}
 .rec-name{font-size:12px;color:#e0e0e0;font-weight:600}
 .rec-sub{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
-.rec-sub span{font-size:10px;color:#555;display:flex;align-items:center;gap:3px}
+.rec-sub span{font-size:10px;color:#888;display:flex;align-items:center;gap:3px}
 .rec-sub span b{color:#888}
 .estado-filters{display:flex;gap:5px;flex-wrap:wrap}
 .ef-btn{font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;border:1px solid #2a2a2a;background:#1a1a1a;color:#555;transition:all .15s;white-space:nowrap}
@@ -181,7 +181,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 .pt-jm{background:#3b0000;color:#fca5a5}
 .pt-rm{background:#1e3a8a;color:#93c5fd}
 .exp-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.exp-meta-item{display:flex;align-items:center;gap:3px;font-size:10px;color:#555}
+.exp-meta-item{display:flex;align-items:center;gap:3px;font-size:10px;color:#888}
 .exp-meta-item i{font-size:12px}
 .exp-meta-item b{color:#999;font-weight:500}
 .exp-or{font-size:10px;color:#444;margin-top:4px}
@@ -548,8 +548,11 @@ function parseRows(rows) {
 
 function col(obj, ...names) {
   for (const n of names) {
-    const v = obj[n.toUpperCase()];
-    if (v) return v;
+    const key = n.toUpperCase();
+    if (obj[key]) return obj[key];
+    // Auto-try underscore variant (e.g. 'FASE TALLER' → 'FASE_TALLER')
+    const keyU = key.replace(/ /g, '_');
+    if (keyU !== key && obj[keyU]) return obj[keyU];
   }
   return '';
 }
@@ -765,14 +768,14 @@ function renderList() {
   for (let _idx = 0; _idx < items.length; _idx++) {
   const r = items[_idx];
     const mat    = col(r,'MATRICULA','MATRÍCULA') || '—';
-    const modelo = col(r,'MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO') || '';
+    const modelo = col(r,'MARCA MODELO','MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO') || '';
     const or     = col(r,'OR','NUM OR','Nº OR','NÚMERO OR','OR_NUM');
     const taller = col(r,'TALLER');
     const estado = col(r,'ESTADO','STATUS','ESTADO EXPEDIENTE');
-    const fase   = col(r,'FASE','FASE REPARACION','FASE REPARACIÓN');
-    const oper   = col(r,'OPERARIO','OPERARIO ASIGNADO');
-    const fEnt   = col(r,'FECHA ENTRADA','FECHA APERTURA','F.ENTRADA','FECHA DE ENTRADA');
-    const fPrev  = col(r,'FECHA PREVISTA','FECHA PREVISTA ENTREGA','F.ENTREGA','FECHA ENTREGA PREVISTA');
+    const fase   = col(r,'FASE TALLER','FASE','FASE REPARACION','FASE REPARACIÓN');
+    const oper   = col(r,'OPERARIO ASIGNADO','OPERARIO');
+    const fEnt   = col(r,'FECHA ENTRADA TALLER','FECHA ENTRADA','FECHA APERTURA','F.ENTRADA','FECHA DE ENTRADA');
+    const fPrev  = col(r,'FECHA COMPROMISO ENTREGA','FECHA PREVISTA','FECHA PREVISTA ENTREGA','F.ENTREGA','FECHA ENTREGA PREVISTA');
 
     // Count recambios for this car
     const recCount = allRec.filter(rec => {
@@ -831,7 +834,9 @@ function df(label, val, opts={}) {
   // In edit mode, render editable input if a field key is provided
   if (opts.field && isEditMode) {
     const fieldKey = opts.field.toUpperCase();
-    const currentVal = currentRaw[fieldKey] || '';
+    const currentVal = currentRaw
+      ? (currentRaw[fieldKey] || currentRaw[fieldKey.replace(/ /g,'_')] || '')
+      : '';
     if (opts.select) {
       const options = opts.select.map(o =>
         `<option value="${o}" ${currentVal===o?'selected':''}>${o}</option>`
@@ -853,19 +858,21 @@ function df(label, val, opts={}) {
 function dateRow(label, val, dotCls='grey', fieldKey='') {
   // In edit mode, show date input if fieldKey provided
   if (fieldKey && isEditMode) {
-    const currentVal = currentRaw[fieldKey.toUpperCase()] || '';
+    const currentVal = currentRaw ? (currentRaw[fieldKey.toUpperCase()] || currentRaw[fieldKey.toUpperCase().replace(/ /g,'_')] || '') : '';
     return `<div class="date-item" style="flex-direction:column;align-items:flex-start;gap:3px">
       <div style="display:flex;align-items:center;gap:7px;width:100%">
         <div class="date-dot ${val ? dotCls : 'grey'}"></div>
-        <div class="date-label" style="font-size:9px;color:#555">${label}</div>
+        <div class="date-label">${label}</div>
       </div>
       <input class="df-input" type="text" data-field="${fieldKey.toUpperCase()}" value="${currentVal.replace(/"/g,'&quot;')}" placeholder="dd/mm/aaaa" style="width:100%">
     </div>`;
   }
+  // In view mode, skip rows with no date
+  if (!val) return '';
   return `<div class="date-item">
-    <div class="date-dot ${val ? dotCls : 'grey'}"></div>
+    <div class="date-dot ${dotCls}"></div>
     <div class="date-label">${label}</div>
-    <div class="date-val ${val?'':'empty'}">${val || 'Sin fecha'}</div>
+    <div class="date-val">${val}</div>
   </div>`;
 }
 
@@ -896,11 +903,11 @@ function _openDetail(rawArg, editModeOverride) {
   document.getElementById('editBadge').classList.toggle('hidden', !isEditMode);
 
   const mat    = col(raw,'MATRICULA','MATRÍCULA') || '—';
-  const modelo = col(raw,'MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO');
+  const modelo = col(raw,'MARCA MODELO','MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO');
   const taller = (col(raw,'TALLER') || raw._TALLER || '').toUpperCase();
   const estado = col(raw,'ESTADO','STATUS','ESTADO EXPEDIENTE');
-  const fase   = col(raw,'FASE','FASE REPARACION','FASE REPARACIÓN');
-  const oper   = col(raw,'OPERARIO','OPERARIO ASIGNADO');
+  const fase   = col(raw,'FASE TALLER','FASE','FASE REPARACION','FASE REPARACIÓN');
+  const oper   = col(raw,'OPERARIO ASIGNADO','OPERARIO');
   const orNum  = col(raw,'OR','NUM OR','Nº OR','NÚMERO OR','OR NUM');
 
   document.getElementById('dpMat').textContent    = mat;
@@ -943,8 +950,8 @@ function _openDetail(rawArg, editModeOverride) {
     <div class="ds-grid">
       ${df('Taller', taller ? tallerPill(taller) : '', {highlight: !!taller})}
       ${df('Estado', estado ? estadoPill(estado) : '', {showEmpty: true, field:'ESTADO', select: ESTADOS})}
-      ${df('Fase', fase||'', {field:'FASE', select: FASES})}
-      ${df('Operario', oper||'', {field:'OPERARIO'})}
+      ${df('Fase actual', fase||'', {showEmpty:!!isEditMode, field:'FASE TALLER', select: FASES})}
+      ${df('Operario asignado', oper||'', {showEmpty:!!isEditMode, field:'OPERARIO ASIGNADO'})}
     </div>`;
   html += section('ti-dashboard', 'Estado actual', estadoHtml);
 
@@ -1003,11 +1010,11 @@ function _openDetail(rawArg, editModeOverride) {
   }
 
   // ── SECCIÓN 3: Fechas clave ───────────────────
-  const fEntrada   = col(raw,'FECHA ENTRADA','F.ENTRADA','FECHA DE ENTRADA','FECHA APERTURA');
+  const fEntrada   = col(raw,'FECHA ENTRADA TALLER','FECHA ENTRADA','F.ENTRADA','FECHA DE ENTRADA','FECHA APERTURA');
   const fOR        = col(raw,'FECHA APERTURA OR','APERTURA OR','FECHA OR','F.OR','FECHA APERTURA');
   const fPerit     = col(raw,'FECHA PERITACION','FECHA PERITACIÓN','F.PERITACION','RECIBIDA PERITACION','PERITACION RECIBIDA','FECHA RECEPCION PERITACION');
   const fCita      = col(raw,'CITA','FECHA CITA','PROXIMA CITA','PRÓXIMA CITA','F.CITA','FECHA PROXIMA CITA');
-  const fEntrega   = col(raw,'FECHA ENTREGA','FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA');
+  const fEntrega   = col(raw,'FECHA COMPROMISO ENTREGA','FECHA ENTREGA','FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA');
   const fReal      = col(raw,'FECHA ENTREGA REAL','ENTREGA REAL','F.ENTREGA REAL');
 
   const fechasHtml = `
@@ -1032,13 +1039,13 @@ function _openDetail(rawArg, editModeOverride) {
 
   let vehiculoHtml = `<div class="ds-grid">
     ${df('Matrícula', mat, {valCls:'big', field:'MATRICULA'})}
-    ${df('Modelo', modelo||'', {field:'MODELO'})}
+    ${df('Modelo', `<span id="detModelo">${modelo||''}</span>`, {field:'MODELO'})}
     ${df('VIN / Bastidor', vin||'', {full: true, field:'VIN'})}
     ${df('Kilómetros', km||'', {field:'KM'})}
     ${df('Color', col2||'', {field:'COLOR'})}
-    ${df('Cliente / Propietario', prop||'', {full: true, field:'PROPIETARIO'})}
-    ${df('Teléfono', tel ? (isEditMode ? tel : `<a href="tel:${tel}" style="color:#93c5fd;display:flex;align-items:center;gap:4px"><i class="ti ti-phone" style="font-size:12px"></i>${tel}</a>`) : '', {field:'TELEFONO'})}
-    ${email ? df('Email', isEditMode ? email : `<a href="mailto:${email}" style="color:#93c5fd">${email}</a>`, {full:true, field:'EMAIL'}) : ''}
+    ${df('Cliente / Propietario', `<span id="detCliente">${prop||''}</span>`, {full: true, field:'PROPIETARIO'})}
+    ${df('Teléfono', `<span id="detTel">${tel ? `<a href="tel:${tel}" style="color:#93c5fd;display:flex;align-items:center;gap:4px"><i class="ti ti-phone" style="font-size:12px"></i>${tel}</a>` : ''}</span>`, {field:'TELEFONO'})}
+    ${df('Email', `<span id="detEmail">${email ? `<a href="mailto:${email}" style="color:#93c5fd">${email}</a>` : ''}</span>`, {full:!!email||!!isEditMode, field:'EMAIL', showEmpty:false})}
   </div>`;
   // Badge de fuente CITAS si el dato vino de ahí
   if (cita && !prop && (cita['Cliente']||cita['Teléfono'])) {
@@ -1047,7 +1054,7 @@ function _openDetail(rawArg, editModeOverride) {
   html += section('ti-car', 'Vehículo', vehiculoHtml);
 
   // ── SECCIÓN 5: Siniestro / Seguro ────────────
-  const sinNum  = col(raw,'NUM SINIESTRO','SINIESTRO','Nº SINIESTRO','NUMERO SINIESTRO','NUM. SINIESTRO','REFERENCIA SINIESTRO','REF SINIESTRO');
+  const sinNum  = col(raw,'Nº SINIESTRO','NUM SINIESTRO','SINIESTRO','NUMERO SINIESTRO','NUM. SINIESTRO','REFERENCIA SINIESTRO','REF SINIESTRO');
   const aseg    = col(raw,'ASEGURADORA','COMPAÑIA','COMPAÑÍA','SEGURO','CIAS','CIA SEGUROS','COMPAÑIA SEGURO');
   const perito  = col(raw,'PERITO','NOMBRE PERITO','PERITADOR');
   const tiperit = col(raw,'TIPO SINIESTRO','TIPO PERITACION','TIPO PERITACIÓN','TIPO');
@@ -1080,7 +1087,30 @@ function _openDetail(rawArg, editModeOverride) {
     html += section('ti-tools', 'Orden de Reparación', orHtml);
   }
 
-  // ── SECCIÓN: Horas (de CITAS sheet) ──────────
+  // ── SECCIÓN: Económico / Importes ────────────
+  const impPer  = col(raw,'IMPORTE PERITACION','IMPORTE_PERITACION','IMPORTE PERITACIÓN','IMPORTE_PERITACIÓN','IMPORTE ESTIMADO');
+  const impReal = col(raw,'IMPORTE REAL','IMPORTE_REAL','TOTAL REAL','IMPORTE TOTAL');
+  const dif     = col(raw,'DIFERENCIA');
+  const estPres = col(raw,'ESTADO PRESUPUESTO','ESTADO_PRESUPUESTO','ESTADO PRES');
+  const compPago= col(raw,'COMPROMISO PAGO','COMPROMISO_PAGO','COMPROMISO DE PAGO');
+  const franc   = col(raw,'FRANQUICIA IMPORTE','FRANQUICIA_IMPORTE','FRANQUICIA','IMPORTE FRANQUICIA');
+  const fPres   = col(raw,'FECHA PRESUPUESTO','FECHA_PRESUPUESTO','F.PRESUPUESTO');
+
+  if (impPer || impReal || estPres || franc || fPres || isEditMode) {
+    const fmtEur = v => v ? (v.includes('€') || v.includes('EUR') ? v : `${v} €`) : '';
+    const econHtml = `<div class="ds-grid">
+      ${df('Importe peritación', fmtEur(impPer)||impPer||'', {highlight:!!impPer, field:'IMPORTE_PERITACION'})}
+      ${df('Importe real', fmtEur(impReal)||impReal||'', {field:'IMPORTE_REAL'})}
+      ${dif ? df('Diferencia', fmtEur(dif)||dif, {valCls: parseFloat(dif)<0?'red':'green'}) : ''}
+      ${df('Estado presupuesto', estPres||'', {field:'ESTADO_PRESUPUESTO'})}
+      ${franc  ? df('Franquicia', fmtEur(franc)||franc) : ''}
+      ${compPago ? df('Compromiso pago', compPago, {full:true}) : ''}
+      ${fPres ? df('Fecha presupuesto', fPres) : ''}
+    </div>`;
+    html += section('ti-currency-euro', 'Económico', econHtml);
+  }
+
+  // ── SECCIÓN: Horas (de CITAS sheet o EXP) ────
   if (cita && !isEditMode) {
     const hPres = parseFloat((cita['H.Presupuestadas'] || '0').replace(',','.')) || 0;
     const hChap = parseFloat((cita['H.Chapa']  || '0').replace(',','.')) || 0;
@@ -1119,6 +1149,21 @@ function _openDetail(rawArg, editModeOverride) {
       horasHtml += `<div class="horas-fichajes-note"><i class="ti ti-clock-pause" style="margin-right:4px"></i>Horas reales: integración con app de fichajes pendiente</div>
       </div>`;
       html += section('ti-clock', 'Horas de trabajo', horasHtml);
+    }
+  } else if (!isEditMode) {
+    // Fallback: horas del EXP sheet si no hay CITAS
+    const hPresExp = parseFloat((col(raw,'HORAS PRESUPUESTADAS','HORAS_PRESUPUESTADAS') || '0').replace(',','.')) || 0;
+    if (hPresExp > 0) {
+      const horasExpHtml = `<div class="horas-wrap">
+        <div class="horas-total">
+          <div>
+            <div class="horas-total-lbl">Horas presupuestadas</div>
+            <div class="horas-total-num">${hPresExp}h</div>
+          </div>
+        </div>
+        <div class="horas-fichajes-note"><i class="ti ti-clock-pause" style="margin-right:4px"></i>Horas reales: integración con app de fichajes pendiente</div>
+      </div>`;
+      html += section('ti-clock', 'Horas de trabajo', horasExpHtml);
     }
   }
 
@@ -1298,28 +1343,47 @@ function _openDetail(rawArg, editModeOverride) {
 
   // ── SECCIÓN 10: Resto de campos (collapsible) ──
   const shownKeys = new Set([
-    'MATRICULA','MATRÍCULA','MODELO','MARCA','MARCA/MODELO','TALLER','ESTADO','STATUS','FASE',
-    'OPERARIO','OPERARIO ASIGNADO','OR','NUM OR','Nº OR','NÚMERO OR','OR NUM',
-    'FECHA ENTRADA','F.ENTRADA','FECHA DE ENTRADA','FECHA APERTURA',
+    // Identificación
+    'MATRICULA','MATRÍCULA','OR','NUM OR','Nº OR','NÚMERO OR','OR NUM','TALLER','ESTADO','STATUS',
+    // Modelo
+    'MODELO','MARCA','MARCA MODELO','MARCA_MODELO','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO',
+    // Fase/Operario
+    'FASE','FASE TALLER','FASE_TALLER','FASE REPARACION','FASE REPARACIÓN',
+    'OPERARIO','OPERARIO ASIGNADO','OPERARIO_ASIGNADO',
+    // Fechas
+    'FECHA ENTRADA','FECHA ENTRADA TALLER','FECHA_ENTRADA_TALLER','F.ENTRADA','FECHA DE ENTRADA','FECHA APERTURA',
     'FECHA APERTURA OR','APERTURA OR','FECHA OR','F.OR',
-    'FECHA PERITACION','FECHA PERITACIÓN','F.PERITACION','PERITACION RECIBIDA',
+    'FECHA PERITACION','FECHA_PERITACION','FECHA PERITACIÓN','F.PERITACION','PERITACION RECIBIDA','RECIBIDA PERITACION','FECHA RECEPCION PERITACION',
     'CITA','FECHA CITA','PROXIMA CITA','PRÓXIMA CITA','F.CITA',
-    'FECHA ENTREGA','FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA',
-    'FECHA ENTREGA REAL','ENTREGA REAL',
+    'FECHA ENTREGA','FECHA COMPROMISO ENTREGA','FECHA_COMPROMISO_ENTREGA','FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA',
+    'FECHA ENTREGA REAL','FECHA_ENTREGA_REAL','ENTREGA REAL',
+    'FECHA PRESUPUESTO','FECHA_PRESUPUESTO','F.PRESUPUESTO',
+    // Vehículo
     'VIN','BASTIDOR','VIN/BASTIDOR','Nº BASTIDOR','NUM BASTIDOR',
     'KM','KILÓMETROS','KILOMETROS','KMS','COLOR','COLOUR',
+    // Cliente
     'PROPIETARIO','CLIENTE','NOMBRE','NOMBRE CLIENTE','NOMBRE PROPIETARIO',
-    'TELEFONO','TELÉFONO','TEL','MÓVIL','MOVIL','TLF',
-    'NUM SINIESTRO','SINIESTRO','Nº SINIESTRO','NUMERO SINIESTRO','REFERENCIA SINIESTRO',
+    'TELEFONO','TELÉFONO','TEL','MÓVIL','MOVIL','TLF','EMAIL','CORREO',
+    // Siniestro
+    'NUM SINIESTRO','SINIESTRO','Nº SINIESTRO','Nº_SINIESTRO','NUMERO SINIESTRO','REFERENCIA SINIESTRO',
     'ASEGURADORA','COMPAÑIA','COMPAÑÍA','SEGURO','CIAS','CIA SEGUROS',
     'PERITO','NOMBRE PERITO','PERITADOR','TIPO SINIESTRO','TIPO PERITACION','TIPO',
     'POLIZA','PÓLIZA','NUM POLIZA','Nº POLIZA',
-    'LINK OR','LINK_OR','ENLACE OR','LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK_CARPETA_DRIVE',
+    // Económico
+    'IMPORTE PERITACION','IMPORTE_PERITACION','IMPORTE PERITACIÓN','IMPORTE_PERITACIÓN',
+    'IMPORTE REAL','IMPORTE_REAL','TOTAL REAL','IMPORTE TOTAL',
+    'DIFERENCIA','ESTADO PRESUPUESTO','ESTADO_PRESUPUESTO',
+    'COMPROMISO PAGO','COMPROMISO_PAGO','FRANQUICIA','FRANQUICIA IMPORTE','FRANQUICIA_IMPORTE',
+    // Horas
+    'HORAS PRESUPUESTADAS','HORAS_PRESUPUESTADAS',
+    // Links
+    'LINK OR','LINK_OR','ENLACE OR',
+    'LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK_CARPETA_DRIVE','CARPETA_DRIVE','LINK_FOTOS',
     'LINK PERITACION','LINK_PERITACION','ENLACE PERITACION','LINK PERITACIÓN',
     'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO',
+    // Notas
     'OBSERVACIONES','NOTAS','OBS','NOTA','COMENTARIO','COMENTARIOS',
-    '_TALLER','VEHICULO','VEHÍCULO','MARCA / MODELO',
-    'RECIBIDA PERITACION','FECHA RECEPCION PERITACION',
+    '_TALLER',
   ]);
   const extras = Object.entries(raw).filter(([k,v]) => v && !shownKeys.has(k) && !k.startsWith('_'));
 
@@ -1386,6 +1450,88 @@ function fmtTrelloDate(iso) {
 function renderTrello(card) {
   const el = document.getElementById('trello-section');
   if (!el) return;
+
+  // ── Actualizar Marca/Modelo desde el nombre de la tarjeta Trello ──
+  // El nombre suele ser "MATRICULA Marca Modelo" o "Marca Modelo - MATRICULA"
+  if (card.name && currentRaw) {
+    const mat = col(currentRaw,'MATRICULA','MATRÍCULA').toUpperCase().replace(/[\s-]/g,'');
+    // Eliminar la matrícula y separadores del nombre para quedarnos con Marca Modelo
+    let nombre = card.name
+      .replace(new RegExp(mat, 'gi'), '')           // quitar matrícula
+      .replace(/\b(OR\s*\d+)\b/gi, '')             // quitar OR558 etc.
+      .replace(/^[\s\-–—|·:]+|[\s\-–—|·:]+$/g,'') // quitar separadores al inicio/fin
+      .replace(/\s{2,}/g,' ')                       // espacios múltiples
+      .trim();
+    if (nombre && nombre.length > 2) {
+      const dpModelo = document.getElementById('dpModelo');
+      if (dpModelo) dpModelo.textContent = nombre;
+      const detModelo = document.getElementById('detModelo');
+      if (detModelo) detModelo.textContent = nombre;
+      const inputModelo = document.querySelector('[data-field="MODELO"]');
+      if (inputModelo && inputModelo.tagName === 'INPUT' && !inputModelo.value) inputModelo.value = nombre;
+    }
+  }
+
+  // ── Extraer cliente, teléfono y email de la descripción de Trello ──
+  // Trello es SIEMPRE la fuente primaria — sobrescribe lo del sheet
+  if (card.desc && card.desc.trim()) {
+    const desc = card.desc;
+
+    // Cliente: busca "Cliente: Nombre" o "Propietario: Nombre" o primera línea de texto puro
+    let trelloCliente = '';
+    const clienteMatch = desc.match(/(?:cliente|propietario|owner|nombre|name)[:\s]+([^\n·|,\d@]{3,50})/i);
+    if (clienteMatch) {
+      trelloCliente = clienteMatch[1].trim().replace(/\s+/g,' ');
+    } else {
+      // Fallback: primera línea con letras (no URL, no fecha, no teléfono, no email)
+      const firstLine = desc.split('\n').map(l=>l.trim()).find(l =>
+        l && l.length >= 4 && l.length <= 50 &&
+        /^[A-Za-zÀ-ÿ\s]{4,50}$/.test(l) &&
+        !l.includes('@') && !/^\d/.test(l)
+      );
+      if (firstLine) trelloCliente = firstLine;
+    }
+
+    // Teléfono: número español 9 dígitos
+    const telMatch = desc.match(/(\+?(?:34[\s\-.]?)?[6789]\d[\s\-.]?\d{2}[\s\-.]?\d{2}[\s\-.]?\d{2}[\s\-.]?\d{2})/);
+    const trelloTel = telMatch ? telMatch[1].replace(/[\s\-.]/g,'').replace(/^0034/,'34') : '';
+
+    // Email
+    const emailMatch = desc.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
+    const trelloEmail = emailMatch ? emailMatch[1] : '';
+
+    // Trello es primario — sobrescribe siempre cuando tiene dato
+    if (trelloCliente) {
+      const detCliente = document.getElementById('detCliente');
+      if (detCliente) detCliente.textContent = trelloCliente;
+      const inputCliente = document.querySelector('[data-field="PROPIETARIO"]');
+      if (inputCliente && inputCliente.tagName === 'INPUT') inputCliente.value = trelloCliente;
+    }
+    if (trelloTel) {
+      const detTel = document.getElementById('detTel');
+      if (detTel) detTel.innerHTML = `<a href="tel:${trelloTel}" style="color:#93c5fd;display:flex;align-items:center;gap:4px"><i class="ti ti-phone" style="font-size:12px"></i>${trelloTel}</a>`;
+      const inputTel = document.querySelector('[data-field="TELEFONO"]');
+      if (inputTel && inputTel.tagName === 'INPUT') inputTel.value = trelloTel;
+    }
+    if (trelloEmail) {
+      // Mostrar / actualizar email en panel
+      const detEmail = document.getElementById('detEmail');
+      if (detEmail) {
+        detEmail.innerHTML = `<a href="mailto:${trelloEmail}" style="color:#93c5fd">${trelloEmail}</a>`;
+      } else {
+        // Si no existe el span, inyectar debajo del teléfono
+        const telRow = document.getElementById('detTel')?.closest('.df-row, .ds-field');
+        if (telRow) {
+          const emailDiv = document.createElement('div');
+          emailDiv.style.cssText = 'font-size:10px;color:#3b82f6;margin-top:3px';
+          emailDiv.innerHTML = `<i class="ti ti-mail" style="margin-right:3px"></i><a href="mailto:${trelloEmail}" style="color:#93c5fd">${trelloEmail}</a>`;
+          telRow.insertAdjacentElement('afterend', emailDiv);
+        }
+      }
+      const inputEmail = document.querySelector('[data-field="EMAIL"]');
+      if (inputEmail && inputEmail.tagName === 'INPUT') inputEmail.value = trelloEmail;
+    }
+  }
 
   let html = `<div class="ds-title"><i class="ti ti-brand-trello" style="color:#579dff"></i>Trello — ${card.name}</div>`;
 
@@ -1704,14 +1850,12 @@ function initGIS() {
 }
 
 function requestEdit() {
-  if (OAUTH_CLIENT_ID.includes('TU_OAUTH')) {
-    showToast('Configura el OAuth Client ID primero', 'error', 4000);
-    return;
+  // Entrar en modo edición siempre — auth solo se pide al guardar
+  enterEditMode();
+  if (!accessToken && !OAUTH_CLIENT_ID.includes('TU_OAUTH')) {
+    // Iniciar OAuth en segundo plano para tenerlo listo al guardar
+    if (!tokenClient) initGIS();
   }
-  if (!tokenClient) { showToast('Cargando Google…', 'loading'); initGIS(); setTimeout(requestEdit, 800); return; }
-  if (accessToken) { enterEditMode(); return; }
-  showToast('Conectando con Google…', 'loading');
-  tokenClient.requestAccessToken({ prompt: '' });
 }
 
 function enterEditMode() {
@@ -1761,7 +1905,36 @@ async function appendHistorial(mat, orNum, camposCambiados) {
 }
 
 async function saveEdits() {
-  if (!accessToken) { showToast('Sin sesión Google', 'error'); return; }
+  if (!accessToken) {
+    if (OAUTH_CLIENT_ID.includes('TU_OAUTH')) {
+      showToast('Para guardar: configura el OAuth Client ID en Google Cloud Console', 'error', 6000);
+      return;
+    }
+    // Iniciar OAuth y volver a intentar guardar tras auth
+    showToast('Conectando con Google para guardar…', 'loading');
+    if (!tokenClient) initGIS();
+    // Reconfigurar callback para que guarde después del login
+    setTimeout(() => {
+      if (!tokenClient) { showToast('Error al cargar Google Auth', 'error'); return; }
+      const origCallback = tokenClient._callback;
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: OAUTH_CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/spreadsheets',
+        callback: async (resp) => {
+          if (resp.error) { showToast('Error Google: ' + resp.error, 'error'); return; }
+          accessToken = resp.access_token;
+          try {
+            const ui = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } });
+            const u = await ui.json();
+            currentUserEmail = u.email || null; currentUserName = u.name || u.email || null;
+          } catch(e) {}
+          saveEdits(); // Reintentar ahora con token
+        }
+      });
+      tokenClient.requestAccessToken({ prompt: '' });
+    }, 400);
+    return;
+  }
   if (!currentRaw || !currentRaw._rowIdx || !currentRaw._sheetTab) {
     showToast('No se puede localizar la fila en el sheet', 'error'); return;
   }
