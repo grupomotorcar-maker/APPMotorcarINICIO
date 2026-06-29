@@ -923,6 +923,21 @@ function _openDetail(rawArg, editModeOverride) {
   const ESTADOS = ['EN PROCESO','PENDIENTE','PRESUPUESTO','TERMINADO','ENTREGADO','EN ESPERA','PARADO','FACTURADO','CERRADO'];
   const FASES   = ['Peritación','Chapa','Pintura','Montaje','Control calidad','Mecánica','Entrega','Facturación'];
 
+  // ── Variables derivadas (usadas en múltiples secciones) ──
+  const fotosAlb     = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO');
+  const trelloCardId = extractTrelloId(fotosAlb);
+  const _orUP2  = orNum.toUpperCase().replace(/\s/g,'');
+  const _matUP2 = mat.replace(/[-\s]/g,'').toUpperCase();
+  const cita = allCitas.find(c => {
+    const cOr     = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
+    const cMat    = (c['Matrícula'] || c['MATRICULA'] || '').replace(/[-\s]/g,'').toUpperCase();
+    const cTrello = (c['Trello Card ID'] || '').trim();
+    if (_orUP2  && cOr  && cOr  === _orUP2)  return true;
+    if (_matUP2 && cMat && cMat === _matUP2)  return true;
+    if (cTrello && trelloCardId && cTrello === trelloCardId) return true;
+    return false;
+  });
+
   // ── SECCIÓN 1: Estado actual ──────────────────
   const estadoHtml = `
     <div class="ds-grid">
@@ -934,8 +949,7 @@ function _openDetail(rawArg, editModeOverride) {
   html += section('ti-dashboard', 'Estado actual', estadoHtml);
 
   // ── SECCIÓN 2: Trello & documentos ───────────
-  const fotosAlb     = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO');
-  const trelloCardId = extractTrelloId(fotosAlb);
+  // (trelloCardId ya definido arriba)
   const linkOR       = col(raw,'LINK OR','LINK_OR','ENLACE OR','OR LINK','LINK ORDEN');
   const linkDrive    = col(raw,
     'LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK CARPETA DRIVE','LINK_CARPETA_DRIVE',
@@ -1049,19 +1063,6 @@ function _openDetail(rawArg, editModeOverride) {
     </div>`;
     html += section('ti-shield-check', 'Siniestro / Seguro', sinHtml);
   }
-
-  // ── Buscar cita vinculada en CITAS sheet ─────
-  const _orUP  = orNum.toUpperCase().replace(/\s/g,'');
-  const _matUP = mat.toUpperCase().replace(/\s/g,'');
-  const cita = allCitas.find(c => {
-    const cOr     = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
-    const cMat    = (c['Matrícula'] || c['MATRICULA'] || '').toUpperCase().replace(/\s/g,'');
-    const cTrello = (c['Trello Card ID'] || '').trim();
-    if (_orUP  && cOr  && cOr  === _orUP)  return true;
-    if (_matUP && cMat && cMat === _matUP)  return true;
-    if (cTrello && trelloCardId && cTrello === trelloCardId) return true;
-    return false;
-  });
 
   // ── SECCIÓN 6: OR ────────────────────────────
   if (orNum) {
