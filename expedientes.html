@@ -1040,12 +1040,14 @@ function openDetail(rawArg, editModeOverride) {
   }
 
   // ── Buscar cita vinculada en CITAS sheet ─────
+  const _orUP  = orNum.toUpperCase().replace(/\s/g,'');
+  const _matUP = mat.toUpperCase().replace(/\s/g,'');
   const cita = allCitas.find(c => {
-    const cOr  = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
-    const cMat = (c['Matrícula'] || c['MATRICULA'] || '').toUpperCase().replace(/\s/g,'');
+    const cOr     = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
+    const cMat    = (c['Matrícula'] || c['MATRICULA'] || '').toUpperCase().replace(/\s/g,'');
     const cTrello = (c['Trello Card ID'] || '').trim();
-    if (orUP  && cOr  && cOr  === orUP)  return true;
-    if (matUP && cMat && cMat === matUP) return true;
+    if (_orUP  && cOr  && cOr  === _orUP)  return true;
+    if (_matUP && cMat && cMat === _matUP)  return true;
     if (cTrello && trelloCardId && cTrello === trelloCardId) return true;
     return false;
   });
