@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Expedientes – Motorcar</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<script src="https://accounts.google.com/gsi/client" async></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size:13px;display:flex;flex-direction:column;height:100vh;overflow:hidden}
@@ -31,6 +32,74 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 #searchInput{width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:8px 10px 8px 34px;color:#f0f0f0;font-size:12px;outline:none;transition:border-color .15s}
 #searchInput::placeholder{color:#444}
 #searchInput:focus{border-color:#555}
+.search-hint{font-size:10px;color:#333;padding:2px 4px}
+
+/* ─── DETAIL FULL SCREEN ─── */
+.detail-full{position:fixed;inset:0;background:#0a0a0a;z-index:400;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .2s;transform:translateX(100%)}
+.detail-full.open{opacity:1;pointer-events:all;transform:translateX(0);transition:opacity .2s,transform .25s cubic-bezier(.4,0,.2,1)}
+.detail-full-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#111;border-bottom:1px solid #1e1e1e;flex-shrink:0;height:50px}
+.df-back{display:flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px 12px;cursor:pointer;color:#ccc;font-size:12px;font-weight:600}
+.df-back:hover{background:#252525;color:#fff}
+.df-mat{font-size:14px;font-weight:900;color:#fff;letter-spacing:.5px}
+.df-modelo{font-size:11px;color:#555}
+.detail-full-body{flex:1;overflow-y:auto;padding:12px 14px 60px}
+.detail-full-body::-webkit-scrollbar{width:4px}
+.detail-full-body::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+
+/* ─── DETAIL SECTIONS ─── */
+.ds{margin-bottom:14px}
+.ds-title{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:flex;align-items:center;gap:5px;padding-bottom:5px;border-bottom:1px solid #161616}
+.ds-title i{font-size:13px;color:#666}
+.ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.ds-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.df{background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:8px 10px}
+.df.full{grid-column:1/-1}
+.df.highlight{border-color:#cc0000}
+.df-label{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.df-val{font-size:12px;color:#e0e0e0;font-weight:500;word-break:break-word;line-height:1.4}
+.df-val.big{font-size:15px;font-weight:800;color:#fff}
+.df-val.empty{color:#2a2a2a;font-style:italic;font-size:11px}
+.df-val.red{color:#ff6b6b}
+.df-val.green{color:#86efac}
+.df-val.amber{color:#fbbf24}
+.df-val.blue{color:#93c5fd}
+
+/* Date fields with colored indicators */
+.date-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#141414;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:4px}
+.date-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.date-dot.green{background:#22c55e}
+.date-dot.amber{background:#f59e0b}
+.date-dot.red{background:#ef4444}
+.date-dot.blue{background:#3b82f6}
+.date-dot.grey{background:#374151}
+.date-label{font-size:10px;color:#555;min-width:140px}
+.date-val{font-size:12px;color:#e0e0e0;font-weight:600;margin-left:auto}
+.date-val.empty{color:#2a2a2a;font-style:italic;font-weight:400}
+
+/* Link buttons */
+.link-row{display:flex;flex-direction:column;gap:5px}
+.lbtn{display:flex;align-items:center;gap:9px;background:#141414;border:1px solid #2a2a2a;border-radius:9px;padding:10px 12px;text-decoration:none;color:#ccc;font-size:12px;font-weight:500;transition:all .15s}
+.lbtn:hover{background:#1e1e1e;border-color:#444;color:#fff}
+.lbtn i{font-size:20px;flex-shrink:0}
+.lbtn.trello i{color:#579dff}
+.lbtn.trello{border-color:#0052cc22}
+.lbtn.drive i{color:#34a853}
+.lbtn.doc i{color:#4285f4}
+.lbtn.perit i{color:#a855f7}
+.lbtn.disabled{opacity:.3;pointer-events:none}
+.lbtn-sub{font-size:10px;color:#555;margin-top:1px}
+
+/* Recambios en detalle */
+.rec-list{display:flex;flex-direction:column;gap:4px}
+.rec-row{background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:9px 11px;border-left:3px solid #2a2a2a}
+.rec-row.ok{border-left-color:#22c55e}
+.rec-row.pend{border-left-color:#f59e0b}
+.rec-row.urg{border-left-color:#ef4444}
+.rec-row.info{border-left-color:#3b82f6}
+.rec-name{font-size:12px;color:#e0e0e0;font-weight:600}
+.rec-sub{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.rec-sub span{font-size:10px;color:#555;display:flex;align-items:center;gap:3px}
+.rec-sub span b{color:#888}
 .estado-filters{display:flex;gap:5px;flex-wrap:wrap}
 .ef-btn{font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;border:1px solid #2a2a2a;background:#1a1a1a;color:#555;transition:all .15s;white-space:nowrap}
 .ef-btn:hover{color:#ccc}
@@ -39,6 +108,47 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 .ef-pv.on{background:#14532d;color:#86efac}
 .ef-pa.on{background:#451a03;color:#fbbf24}
 .ef-pr.on{background:#1e3a8a;color:#93c5fd}
+/* ── Horas presupuestadas ─────────────────── */
+.horas-wrap{display:flex;flex-direction:column;gap:8px}
+.horas-total{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0c1a3d;border:1px solid #1e3a8a;border-radius:8px}
+.horas-total-num{font-size:22px;font-weight:800;color:#93c5fd}
+.horas-total-lbl{font-size:10px;color:#3b82f6;text-transform:uppercase;letter-spacing:.5px}
+.horas-phases{display:flex;flex-direction:column;gap:5px}
+.horas-row{display:flex;align-items:center;gap:8px}
+.horas-lbl{font-size:10px;color:#888;width:60px;flex-shrink:0}
+.horas-bar-bg{flex:1;height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden}
+.horas-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.horas-val{font-size:11px;font-weight:700;color:#ccc;width:32px;text-align:right;flex-shrink:0}
+.horas-fichajes-note{font-size:10px;color:#555;text-align:center;padding:4px 0;border-top:1px solid #1a1a1a;margin-top:4px}
+
+/* ── Timeline compacto ───────────────────── */
+.tl-last{background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.tl-last-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.tl-last-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tl-last-type{font-size:12px;font-weight:700;flex:1}
+.tl-last-date{font-size:10px;color:#555}
+.tl-last-desc{font-size:11px;color:#aaa;line-height:1.4;margin-left:36px}
+.tl-last-user{font-size:10px;color:#555;margin-left:36px;margin-top:3px}
+.tl-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.tl-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;background:#111;border:1px solid #1e1e1e;border-radius:5px;font-size:9px;color:#888;cursor:default}
+.tl-chip i{font-size:10px}
+.tl-chip-date{color:#555;margin-left:2px}
+
+/* ── Trello cover + galería ──────────────── */
+.trello-cover{width:100%;border-radius:8px;overflow:hidden;margin-bottom:10px;max-height:140px;display:flex;align-items:center;justify-content:center;background:#1a1a1a}
+.trello-cover img{width:100%;height:140px;object-fit:cover;display:block}
+.trello-img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+.trello-img-thumb{aspect-ratio:1;border-radius:6px;overflow:hidden;background:#111;cursor:pointer}
+.trello-img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.trello-attach-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.trello-attach-item{display:flex;align-items:center;gap:7px;padding:5px 8px;background:#111;border:1px solid #1a1a1a;border-radius:6px;text-decoration:none;color:#aaa;font-size:11px}
+.trello-attach-item:hover{background:#1a1a1a;color:#e5e5e5}
+.trello-attach-item i{color:#579dff;font-size:14px;flex-shrink:0}
+
+.ef-cerr.on{background:#1c1c1c;color:#9ca3af;border-color:#374151}
+.exp-card.cerrada{opacity:.55;border-left:3px solid #374151}
+.exp-card.cerrada:hover{opacity:.8}
+.pill-cerrada{background:#1f2937;color:#6b7280;border:1px solid #374151;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.5px;display:inline-flex;align-items:center;gap:4px}
 .ef-pp.on{background:#4c1d95;color:#c4b5fd}
 .ef-pg.on{background:#1f2937;color:#9ca3af}
 .ef-pe.on{background:#3b0000;color:#fca5a5}
@@ -133,6 +243,95 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 .rec-meta span b{color:#888}
 .rec-empty{font-size:11px;color:#333;text-align:center;padding:12px;background:#141414;border-radius:8px}
 
+/* ─── EDIT MODE ─── */
+.edit-bar{display:flex;gap:6px;align-items:center;padding:8px 14px;background:#0f0f0f;border-top:1px solid #1e1e1e;flex-shrink:0}
+.edit-bar.hidden{display:none}
+.btn-edit{display:flex;align-items:center;gap:5px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:7px 14px;cursor:pointer;color:#ccc;font-size:12px;font-weight:600;transition:all .15s;margin-left:auto}
+.btn-edit:hover{background:#252525;color:#fff;border-color:#444}
+.btn-save{display:flex;align-items:center;gap:5px;background:#166534;border:1px solid #15803d;border-radius:8px;padding:7px 14px;cursor:pointer;color:#86efac;font-size:12px;font-weight:700;transition:all .15s;flex:1;justify-content:center}
+.btn-save:hover{background:#15803d}
+.btn-save:disabled{opacity:.5;pointer-events:none}
+.btn-cancel{display:flex;align-items:center;gap:5px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:7px 12px;cursor:pointer;color:#888;font-size:12px;font-weight:600}
+.edit-badge{font-size:9px;background:#cc0000;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+
+/* editable fields */
+.df-input{width:100%;background:#0d0d0d;border:1px solid #cc0000;border-radius:5px;padding:4px 7px;color:#fff;font-size:12px;font-family:system-ui,sans-serif;outline:none;margin-top:2px}
+.df-input:focus{border-color:#ff3333;background:#110000}
+.df-input.area{min-height:70px;resize:vertical}
+.df-select{width:100%;background:#0d0d0d;border:1px solid #cc0000;border-radius:5px;padding:4px 7px;color:#fff;font-size:12px;font-family:system-ui,sans-serif;outline:none;margin-top:2px;-webkit-appearance:none}
+.df.editing .df-label::after{content:' ✎';color:#cc0000;font-size:8px}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;padding:10px 18px;font-size:12px;font-weight:600;color:#e0e0e0;opacity:0;transition:all .3s;pointer-events:none;z-index:500;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:#16a34a;color:#86efac;background:#052e16}
+.toast.error{border-color:#dc2626;color:#fca5a5;background:#450a0a}
+.toast.loading{border-color:#2563eb;color:#93c5fd;background:#0c1a3d}
+
+/* ─── TIMELINE DE PASOS ─── */
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:#1e1e1e}
+.tl-item{position:relative;margin-bottom:10px}
+.tl-dot{position:absolute;left:-20px;top:3px;width:14px;height:14px;border-radius:50%;border:2px solid #0a0a0a;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px}
+.tl-dot i{font-size:8px}
+.tl-card{background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:8px 10px}
+.tl-card:hover{border-color:#2a2a2a}
+.tl-top{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.tl-type{font-size:11px;font-weight:600;color:#e0e0e0;flex:1}
+.tl-date{font-size:9px;color:#444}
+.tl-desc{font-size:11px;color:#888;line-height:1.4;margin-top:2px}
+.tl-user{font-size:9px;color:#333;margin-top:4px;display:flex;align-items:center;gap:3px}
+.tl-user i{font-size:10px}
+.tl-link{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#579dff;margin-top:4px;text-decoration:none}
+.tl-empty{font-size:11px;color:#2a2a2a;text-align:center;padding:16px 0;font-style:italic}
+.tl-add-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#0d0d0d;border:1px dashed #2a2a2a;border-radius:8px;padding:9px;cursor:pointer;color:#555;font-size:11px;font-weight:600;transition:all .15s;margin-bottom:8px}
+.tl-add-btn:hover{border-color:#cc0000;color:#cc0000}
+
+/* ─── MODAL NUEVO PASO ─── */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-wrap.open{opacity:1;pointer-events:all}
+.modal{background:#111;border-radius:14px 14px 0 0;border:1px solid #2a2a2a;border-bottom:none;padding:16px 14px 30px;transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.modal-wrap.open .modal{transform:translateY(0)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.modal-title{font-size:14px;font-weight:700;color:#fff}
+.modal-close{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;padding:4px 10px;cursor:pointer;color:#888;font-size:12px}
+.modal label{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px;margin-top:10px}
+.modal select,.modal input,.modal textarea{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;padding:8px 10px;color:#f0f0f0;font-size:12px;font-family:system-ui,sans-serif;outline:none;transition:border-color .15s}
+.modal select:focus,.modal input:focus,.modal textarea:focus{border-color:#cc0000}
+.modal textarea{min-height:60px;resize:vertical}
+.modal-save{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#cc0000;border:none;border-radius:9px;padding:11px;cursor:pointer;color:#fff;font-size:13px;font-weight:700;margin-top:14px;transition:background .15s}
+.modal-save:hover{background:#ff2222}
+.modal-save:disabled{opacity:.5;pointer-events:none}
+
+/* ─── TRELLO ─── */
+.trello-loading{display:flex;align-items:center;gap:8px;font-size:11px;color:#3b82f6;padding:8px 0}
+.trello-loading i{animation:spin .7s linear infinite;font-size:14px}
+.trello-err{font-size:11px;color:#444;font-style:italic;padding:6px 0}
+.cl-block{margin-bottom:10px}
+.cl-name{font-size:10px;color:#579dff;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.cl-name i{font-size:13px}
+.cl-items{display:flex;flex-direction:column;gap:3px}
+.cl-item{display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:6px;background:#141414;border:1px solid #1e1e1e}
+.cl-item.done{background:#0d1f0d;border-color:#14532d}
+.cl-check{width:14px;height:14px;border-radius:3px;border:1.5px solid #374151;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.cl-item.done .cl-check{background:#16a34a;border-color:#16a34a}
+.cl-item.done .cl-check::after{content:'✓';color:#fff;font-size:9px;font-weight:700}
+.cl-item-text{font-size:11px;color:#ccc;line-height:1.4}
+.cl-item.done .cl-item-text{color:#555;text-decoration:line-through}
+.cl-progress{height:4px;background:#1e1e1e;border-radius:2px;margin-bottom:8px;overflow:hidden}
+.cl-progress-bar{height:100%;background:#16a34a;border-radius:2px;transition:width .3s}
+.trello-comments{display:flex;flex-direction:column;gap:6px}
+.tc-item{background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:8px 10px;border-left:3px solid #579dff}
+.tc-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.tc-who{font-size:10px;color:#579dff;font-weight:600}
+.tc-when{font-size:9px;color:#444;margin-left:auto}
+.tc-text{font-size:11px;color:#ccc;line-height:1.5;white-space:pre-wrap}
+.trello-stat{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.ts-pill{font-size:10px;padding:3px 9px;border-radius:5px;font-weight:600}
+.ts-pill.blue{background:#0c1a3d;color:#93c5fd;border:1px solid #1e3a8a}
+.ts-pill.green{background:#052e16;color:#86efac;border:1px solid #14532d}
+.ts-pill.amber{background:#431407;color:#fbbf24;border:1px solid #78350f}
+
 /* ─── MOBILE BOTTOM SAFE AREA ─── */
 @media (max-width: 600px) {
   .detail-panel{max-height:92vh}
@@ -162,7 +361,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 <div class="filters">
   <div class="search-wrap">
     <i class="ti ti-search"></i>
-    <input id="searchInput" type="search" placeholder="Buscar matrícula, modelo, operario…" oninput="renderList()">
+    <input id="searchInput" type="search" placeholder="Matrícula, siniestro, OR, cliente, perito…" oninput="renderList()">
   </div>
   <div class="estado-filters">
     <button class="ef-btn ef-todos on" onclick="setEstado('TODOS',this)">Todos</button>
@@ -171,6 +370,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
     <button class="ef-btn ef-pr" onclick="setEstado('PENDIENTE',this)">Pendiente</button>
     <button class="ef-btn ef-pp" onclick="setEstado('PRESUPUESTO',this)">Presupuesto</button>
     <button class="ef-btn ef-pe" onclick="setEstado('ENTREGADO',this)">Entregado</button>
+    <button class="ef-btn ef-cerr" id="btnCerradas" onclick="toggleCerradas(this)" title="Ver expedientes cerrados/facturados/archivados en Trello"><i class="ti ti-lock" style="font-size:9px;margin-right:3px"></i>Cerradas</button>
   </div>
 </div>
 
@@ -186,18 +386,55 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
   <div class="loading"><i class="ti ti-loader"></i><span>Cargando expedientes…</span></div>
 </div>
 
-<!-- DETAIL PANEL -->
-<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
-  <div class="detail-panel" id="detailPanel">
-    <div class="dp-handle"></div>
-    <div class="dp-hdr">
-      <div>
-        <div class="dp-mat" id="dpMat">—</div>
-        <div class="dp-modelo" id="dpModelo"></div>
-      </div>
-      <button class="dp-close" onclick="closeDetail()">✕</button>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- DETAIL FULLSCREEN -->
+<div class="detail-full" id="detailOverlay">
+  <div class="detail-full-hdr">
+    <div class="df-back" onclick="closeDetail()">
+      <i class="ti ti-arrow-left"></i> Volver
     </div>
-    <div class="dp-body" id="dpBody"></div>
+    <div style="flex:1;min-width:0">
+      <div class="df-mat" id="dpMat">—</div>
+      <div class="df-modelo" id="dpModelo"></div>
+    </div>
+    <span class="edit-badge hidden" id="editBadge">editando</span>
+  </div>
+  <div class="detail-full-body" id="dpBody"></div>
+  <!-- Barra de acciones (editar / guardar / cancelar) -->
+  <div class="edit-bar" id="editBar">
+    <button class="btn-edit" id="btnEdit" onclick="requestEdit()">
+      <i class="ti ti-pencil"></i> Editar
+    </button>
+  </div>
+  <div class="edit-bar hidden" id="saveBar">
+    <button class="btn-cancel" onclick="cancelEdit()">
+      <i class="ti ti-x"></i> Cancelar
+    </button>
+    <button class="btn-save" id="btnSave" onclick="saveEdits()">
+      <i class="ti ti-device-floppy"></i> Guardar cambios
+    </button>
+  </div>
+</div>
+
+<!-- MODAL NUEVO PASO -->
+<div class="modal-wrap" id="pasoModal" onclick="if(event.target===this)closePasoModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title"><i class="ti ti-plus" style="color:#cc0000;margin-right:5px"></i>Añadir paso</span>
+      <button class="modal-close" onclick="closePasoModal()">✕</button>
+    </div>
+    <div id="pasoExpInfo" style="background:#141414;border:1px solid #1e1e1e;border-radius:7px;padding:7px 10px;margin-bottom:10px;font-size:11px;color:#888"></div>
+    <label>Tipo de paso</label>
+    <select id="pasoTipo"></select>
+    <label>Descripción / Nota (opcional)</label>
+    <textarea id="pasoDesc" placeholder="Ej: Peritación de AXA recibida por email, pendiente revisar valoración…"></textarea>
+    <label>Link relacionado (Drive, email, doc…)</label>
+    <input id="pasoLink" type="url" placeholder="https://…">
+    <button class="modal-save" id="pasoSaveBtn" onclick="savePaso()">
+      <i class="ti ti-device-floppy"></i> Guardar paso
+    </button>
   </div>
 </div>
 
@@ -206,16 +443,52 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:system-ui,sans-serif;font-size
 //  CONFIG
 // ═══════════════════════════════════════════
 const API_KEY = 'AIzaSyDS855T1-C6AGB-Jhifb-cydpI20V3zxWY';
+// ► RELLENA ESTO con tu OAuth Client ID (ver instrucciones en comentarios abajo)
+const OAUTH_CLIENT_ID = 'TU_OAUTH_CLIENT_ID_AQUI.apps.googleusercontent.com';
 
 const SID = {
-  EXP:     '1Rx4oNjzORTqqYicC5dp-k1ZJShXCG63ouGMT8k8lYAM',  // Expedientes
+  EXP:     '1Rx4oNjzORTqqYicC5dp-k1ZJShXCG63ouGMT8k8lYAM',  // Expedientes (tabs: JM Expedientes / RM Expedientes / GRUPO MOTORCAR Expedientes)
   REC_JM:  '1XNq2gcGIqX47KZ_1jOVzLaqkEKLN3BotOua9J-IIxa4',  // Recambios MOTORCAR – tab JOAN Motorcar
-  REC_RM:  '1XNq2gcGIqX47KZ_1jOVzLaqkEKLN3BotOua9J-IIxa4',  // mismo sheet, tab RM
+  REC_RM:  '1XNq2gcGIqX47KZ_1jOVzLaqkEKLN3BotOua9J-IIxa4',  // mismo sheet, tab Raul Motorcar
   PED_JM:  '1d4SGCIXYgmWXsvEbZWTu4LaJq3l08DwpdnscPD0DmW8',  // Pedidos JM
   PED_RM:  '1d4SGCIXYgmWXsvEbZWTu4LaJq3l08DwpdnscPD0DmW8',  // Pedidos RM
 };
 
+// Nombres exactos de las pestañas del sheet Expedientes
+const EXP_TABS = {
+  JM:    'JM Expedientes',
+  RM:    'RM Expedientes',
+  TODOS: 'GRUPO MOTORCAR Expedientes',
+};
+
 const TRELLO_BOARDS = { JM: 'r2eSFTPp', RM: 'yU3BGeVY' };
+const TRELLO_KEY   = 'd33f77576a9263e3f102d76c4a1bdaca';
+const TRELLO_TOKEN = '42a3e02a6e927cbe746211eb323c6f00eefb120aad49897b945e3f793eed94a8';
+
+// Sheet CITAS — horas presupuestadas, operario, datos cliente
+const SID_CITAS = '1lX1AEAFYxdecI4XtZnQaBack7Ocb-4u8qlb0pEsQz1g';
+
+// ─── Tipos de paso — icono + color ───────
+const STEP_TYPES = [
+  { key:'APERTURA',          label:'Apertura expediente',      icon:'ti-folder-plus',      color:'#3b82f6' },
+  { key:'FOTOS',             label:'Fotos subidas a Drive',    icon:'ti-camera',            color:'#8b5cf6' },
+  { key:'PERITACION',        label:'Peritación recibida',      icon:'ti-file-certificate',  color:'#f59e0b' },
+  { key:'VALORACION',        label:'Valoración enviada perito',icon:'ti-send',              color:'#f59e0b' },
+  { key:'APROBACION',        label:'Aprobación compañía',      icon:'ti-shield-check',      color:'#22c55e' },
+  { key:'OR_ABIERTA',        label:'OR abierta',               icon:'ti-tools',             color:'#cc0000' },
+  { key:'RECAMBIOS_PEDIDOS', label:'Recambios pedidos',        icon:'ti-package',           color:'#3b82f6' },
+  { key:'RECAMBIOS_OK',      label:'Recambios recibidos',      icon:'ti-package-import',    color:'#22c55e' },
+  { key:'CHAPA_INICIO',      label:'Chapa iniciada',           icon:'ti-hammer',            color:'#f97316' },
+  { key:'CHAPA_FIN',         label:'Chapa terminada',          icon:'ti-hammer',            color:'#22c55e' },
+  { key:'PINTURA_INICIO',    label:'Pintura iniciada',         icon:'ti-paint',             color:'#f97316' },
+  { key:'PINTURA_FIN',       label:'Pintura terminada',        icon:'ti-paint',             color:'#22c55e' },
+  { key:'MONTAJE',           label:'Montaje completado',       icon:'ti-settings',          color:'#8b5cf6' },
+  { key:'CONTROL',           label:'Control de calidad',       icon:'ti-clipboard-check',   color:'#8b5cf6' },
+  { key:'LISTO',             label:'Listo para entrega',       icon:'ti-circle-check',      color:'#22c55e' },
+  { key:'ENTREGADO',         label:'Entregado al cliente',     icon:'ti-car',               color:'#86efac' },
+  { key:'INCIDENCIA',        label:'Incidencia',               icon:'ti-alert-triangle',    color:'#ef4444' },
+  { key:'NOTA',              label:'Nota / Comentario',        icon:'ti-message',           color:'#6b7280' },
+];
 
 // ═══════════════════════════════════════════
 //  STATE
@@ -223,10 +496,22 @@ const TRELLO_BOARDS = { JM: 'r2eSFTPp', RM: 'yU3BGeVY' };
 let allExp    = [];   // [{col:val, ...}, ...]
 let allRec    = [];   // recambios
 let allPed    = [];   // pedidos
+let allPasos  = [];   // pasos del proceso reparación
+let allCitas  = [];   // CITAS_JM + CITAS_RM — horas presupuestadas, operario, datos cliente
 let tallerFlt = 'JM';   // will be overridden by detectParentTaller()
-let estadoFlt = 'TODOS';
+let estadoFlt   = 'TODOS';
+let showCerradas = false;   // toggle para ver expedientes cerrados/facturados
 let expHeaders = [];
 let recHeaders = [];
+
+// ─── OAuth / Edit state ───────────────────
+let tokenClient      = null;
+let accessToken      = null;
+let currentUserEmail = null;   // Google account email of logged-in user
+let currentUserName  = null;   // Display name
+let currentRaw       = null;   // record currently open in detail panel
+let isEditMode       = false;
+let toastTimer       = null;
 
 // ═══════════════════════════════════════════
 //  NAVIGATION
@@ -250,11 +535,14 @@ async function fetchSheet(sheetId, range) {
 function parseRows(rows) {
   if (!rows.length) return { headers: [], data: [] };
   const headers = rows[0].map(h => (h||'').toString().trim().toUpperCase());
-  const data = rows.slice(1).map(row => {
-    const obj = {};
-    headers.forEach((h, i) => { obj[h] = (row[i] || '').toString().trim(); });
+  const data = rows.slice(1).map((row, i) => {
+    const obj = { _rowIdx: i + 2 }; // 1-indexed: row 1 = header, row 2 = first data row
+    headers.forEach((h, j) => { obj[h] = (row[j] || '').toString().trim(); });
     return obj;
-  }).filter(r => Object.values(r).some(v => v));  // skip empty rows
+  }).filter(r => {
+    const { _rowIdx, _TALLER, _sheetTab, ...rest } = r;
+    return Object.values(rest).some(v => v);
+  });
   return { headers, data };
 }
 
@@ -275,15 +563,27 @@ async function loadAll() {
   setListHTML(`<div class="loading"><i class="ti ti-loader"></i><span>Cargando datos…</span></div>`);
 
   try {
-    const [expRows, recJMRows, recRMRows, pedJMRows, pedRMRows] = await Promise.allSettled([
-      fetchSheet(SID.EXP,    'Hoja 1!A:Z'),
+    // Decide which Expedientes tab to load based on active taller
+    const expTab = EXP_TABS[tallerFlt] || EXP_TABS.TODOS;
+
+    const [expRows, expJMRows, expRMRows, recJMRows, recRMRows, pedJMRows, pedRMRows, pasosRows, citasJMRows, citasRMRows] = await Promise.allSettled([
+      fetchSheet(SID.EXP,    `${expTab}!A:Z`),
+      tallerFlt === 'TODOS' ? fetchSheet(SID.EXP, `${EXP_TABS.JM}!A:Z`) : Promise.resolve([]),
+      tallerFlt === 'TODOS' ? fetchSheet(SID.EXP, `${EXP_TABS.RM}!A:Z`) : Promise.resolve([]),
       fetchSheet(SID.REC_JM, 'JOAN Motorcar!A:Z'),
       fetchSheet(SID.REC_RM, 'Raul Motorcar!A:Z').catch(() => fetchSheet(SID.REC_RM, 'Hoja 2!A:Z').catch(() => [])),
       fetchSheet(SID.PED_JM, 'Pedidos JM!A:Z').catch(() => []),
       fetchSheet(SID.PED_RM, 'Pedidos RM!A:Z').catch(() => []),
+      fetchSheet(SID.EXP,    'PASOS!A:H').catch(() => []),  // historial de pasos
+      fetchSheet(SID_CITAS,  'CITAS_JM!A:Z').catch(() => []),
+      fetchSheet(SID_CITAS,  'CITAS_RM!A:Z').catch(() => []),
     ]);
 
-    const expP   = parseRows(expRows.status   === 'fulfilled' ? expRows.value   : []);
+    // Parse Expedientes — use the main tab, fall back to merging JM+RM if TODOS tab is empty
+    const expP    = parseRows(expRows.status === 'fulfilled' ? expRows.value : []);
+    const expJMP  = parseRows(expJMRows.status === 'fulfilled' ? expJMRows.value : []);
+    const expRMP  = parseRows(expRMRows.status === 'fulfilled' ? expRMRows.value : []);
+
     const recJMP = parseRows(recJMRows.status === 'fulfilled' ? recJMRows.value : []);
     const recRMP = parseRows(recRMRows.status === 'fulfilled' ? (Array.isArray(recRMRows.value) ? recRMRows.value : []) : []);
     const pedJMP = parseRows(pedJMRows.status === 'fulfilled' ? pedJMRows.value : []);
@@ -292,7 +592,22 @@ async function loadAll() {
     expHeaders = expP.headers;
     recHeaders = recJMP.headers.length ? recJMP.headers : recRMP.headers;
 
-    allExp  = expP.data;
+    // Tag expedientes with taller + sheetTab (needed for saving edits back to the right place)
+    if (tallerFlt === 'TODOS' && expP.data.length === 0) {
+      // GRUPO MOTORCAR tab empty — merge JM + RM tabs
+      allExp = [
+        ...expJMP.data.map(r => ({...r, _TALLER:'JM', _sheetTab: EXP_TABS.JM})),
+        ...expRMP.data.map(r => ({...r, _TALLER:'RM', _sheetTab: EXP_TABS.RM})),
+      ];
+    } else {
+      const sheetTab = EXP_TABS[tallerFlt] || EXP_TABS.TODOS;
+      allExp = expP.data.map(r => ({
+        ...r,
+        _TALLER:   tallerFlt !== 'TODOS' ? tallerFlt : (col(r,'TALLER') || ''),
+        _sheetTab: sheetTab,
+      }));
+    }
+
     // Tag recambios with taller
     allRec  = [
       ...recJMP.data.map(r => ({...r, _TALLER:'JM'})),
@@ -301,6 +616,28 @@ async function loadAll() {
     allPed  = [
       ...pedJMP.data.map(r => ({...r, _TALLER:'JM'})),
       ...pedRMP.data.map(r => ({...r, _TALLER:'RM'})),
+    ];
+
+    // Pasos — sorted by date desc (newest first)
+    const pasosP = parseRows(pasosRows.status === 'fulfilled' ? pasosRows.value : []);
+    allPasos = pasosP.data.sort((a, b) => {
+      // Sort by FECHA desc (dd/mm/yyyy hh:mm or dd/mm/yyyy)
+      const toMs = s => {
+        if (!s) return 0;
+        const [d,m,yh] = s.split('/');
+        const [y,t] = (yh||'').split(' ');
+        const [h,mn] = (t||'00:00').split(':');
+        return new Date(y,m-1,d,h,mn).getTime();
+      };
+      return toMs(b.FECHA) - toMs(a.FECHA);
+    });
+
+    // CITAS — horas presupuestadas, operario, datos cliente
+    const citasJMP = parseRows(citasJMRows.status === 'fulfilled' ? citasJMRows.value : []);
+    const citasRMP = parseRows(citasRMRows.status === 'fulfilled' ? citasRMRows.value : []);
+    allCitas = [
+      ...citasJMP.data.map(r => ({...r, _TALLER:'JM'})),
+      ...citasRMP.data.map(r => ({...r, _TALLER:'RM'})),
     ];
 
     updateStats();
@@ -320,39 +657,52 @@ function setTaller(t) {
   document.getElementById('btnJM').className   = 'taller-badge ' + (t==='JM'    ? 'active-jm' : 'inactive');
   document.getElementById('btnRM').className   = 'taller-badge ' + (t==='RM'    ? 'active-rm' : 'inactive');
   document.getElementById('btnTodos').className= 'taller-badge ' + (t==='TODOS' ? 'active-jm' : 'inactive');
-  if (allExp.length) { updateStats(); renderList(); }
+  // Each taller reads a different sheet tab — reload data
+  loadAll();
 }
 
 function setEstado(e, btn) {
   estadoFlt = e;
-  document.querySelectorAll('.ef-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.ef-btn:not(#btnCerradas)').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   renderList();
+}
+
+function toggleCerradas(btn) {
+  showCerradas = !showCerradas;
+  btn.classList.toggle('on', showCerradas);
+  renderList();
+}
+
+// Devuelve true si el expediente está cerrado/facturado/archivado
+const CERRADA_KW = ['FACTUR','CERRAD','ARCHIV','FACTURADO','FACTURADA','CERRADO','CERRADA'];
+function isCerrada(r) {
+  if (r._trelloClosed) return true;
+  const est  = col(r,'ESTADO','ESTADO EXPEDIENTE','STATUS').toUpperCase();
+  const fac  = col(r,'FACTURA','FACTURADO','FACTURADA','ESTADO FACTURA','FACTURACION','FACTURACIÓN').toUpperCase();
+  const arch = col(r,'ARCHIVADO','ARCHIVADA','CERRADO','CERRADA').toUpperCase();
+  return CERRADA_KW.some(k => est===k || fac===k || arch===k ||
+    est.startsWith(k) || fac.startsWith(k) || arch.startsWith(k));
 }
 
 function getFiltered() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   return allExp.filter(r => {
     const taller = col(r, 'TALLER', 'TALLER JM', 'TALLER/RM');
-    // If the row has no TALLER column, include it only when tallerFlt matches the _implicit taller
     if (tallerFlt !== 'TODOS') {
       if (taller && taller.toUpperCase() !== tallerFlt) return false;
-      // rows with no TALLER value: only show when taller matches the implicit sheet taller (_TALLER tag)
       if (!taller && r._TALLER && r._TALLER !== tallerFlt) return false;
     }
-    if (false) return false;  // placeholder kept for structure
     if (estadoFlt !== 'TODOS') {
       const est = col(r,'ESTADO','ESTADO EXPEDIENTE','STATUS');
       if (!est.toUpperCase().includes(estadoFlt)) return false;
     }
+    // Ocultar cerradas por defecto; mostrar sólo si hay búsqueda activa o toggle activado
+    const cerrada = isCerrada(r);
+    if (cerrada && !showCerradas && !q) return false;
     if (q) {
-      const hay = [
-        col(r,'MATRICULA','MATRÍCULA'),
-        col(r,'MARCA','MODELO','MARCA/MODELO','MARCA / MODELO'),
-        col(r,'OPERARIO','OPERARIO ASIGNADO'),
-        col(r,'OR','NUM OR','NÚMERO OR','Nº OR'),
-        col(r,'PROPIETARIO','CLIENTE'),
-      ].join(' ').toLowerCase();
+      // Search every column value — siniestro, aseguradora, perito, VIN, OR, matrícula…
+      const hay = Object.values(r).join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -426,25 +776,36 @@ function renderList() {
       return rm && (rm === mat || rm === or);
     }).length;
 
-    html += `<div class="exp-card" onclick='openDetail(${JSON.stringify({mat,modelo,or,taller,estado,fase,oper,fEnt,fPrev,_raw:JSON.stringify(r)})})'>
+    const sinNum   = col(r,'NUM SINIESTRO','SINIESTRO','Nº SINIESTRO','NUMERO SINIESTRO');
+    const multiOR  = allExp.filter(e =>
+      col(e,'MATRICULA','MATRÍCULA').toUpperCase().replace(/\s/g,'') === mat.toUpperCase().replace(/\s/g,'')
+    ).length > 1;
+    const cerrada  = isCerrada(r);
+    const cerradaReason = cerrada
+      ? (r._trelloClosed ? 'Archivada en Trello' : 'Facturada / Cerrada')
+      : '';
+    html += `<div class="exp-card${cerrada?' cerrada':''}" onclick='openDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>
       <div class="exp-top">
         <div>
           <div class="exp-mat">${mat}</div>
           ${modelo ? `<div class="exp-modelo">${modelo}</div>` : ''}
         </div>
         <div class="pills">
-          ${tallerPill(taller)}
+          ${cerrada ? `<span class="pill-cerrada"><i class="ti ti-lock"></i>${cerradaReason}</span>` : ''}
+          ${tallerPill(taller || r._TALLER)}
           ${estadoPill(estado)}
           ${fase ? `<span class="pill pg">${fase}</span>` : ''}
         </div>
       </div>
       <div class="exp-meta">
-        ${oper   ? `<span class="exp-meta-item"><i class="ti ti-user"></i><b>${oper}</b></span>` : ''}
-        ${fEnt   ? `<span class="exp-meta-item"><i class="ti ti-calendar-event"></i>${fEnt}</span>` : ''}
-        ${fPrev  ? `<span class="exp-meta-item"><i class="ti ti-calendar-check"></i>${fPrev}</span>` : ''}
-        ${recCount ? `<span class="exp-meta-item" style="color:#3b82f6"><i class="ti ti-package"></i>${recCount} recambios</span>` : ''}
+        ${oper    ? `<span class="exp-meta-item"><i class="ti ti-user"></i><b>${oper}</b></span>` : ''}
+        ${or      ? `<span class="exp-meta-item"><i class="ti ti-tools"></i>OR: <b>${or}</b></span>` : ''}
+        ${sinNum  ? `<span class="exp-meta-item" style="color:#a855f7"><i class="ti ti-shield-check"></i>${sinNum}</span>` : ''}
+        ${fEnt    ? `<span class="exp-meta-item"><i class="ti ti-calendar-event"></i>${fEnt}</span>` : ''}
+        ${fPrev   ? `<span class="exp-meta-item"><i class="ti ti-calendar-check"></i>${fPrev}</span>` : ''}
+        ${recCount? `<span class="exp-meta-item" style="color:#3b82f6"><i class="ti ti-package"></i>${recCount} recambios</span>` : ''}
+        ${multiOR ? `<span class="exp-meta-item" style="color:#f59e0b"><i class="ti ti-copy"></i>Matrícula con varios ORs</span>` : ''}
       </div>
-      ${or ? `<div class="exp-or">OR: ${or}</div>` : ''}
     </div>`;
   }
   setListHTML(html);
@@ -457,97 +818,340 @@ function setListHTML(h) {
 // ═══════════════════════════════════════════
 //  DETAIL PANEL
 // ═══════════════════════════════════════════
-function openDetail(data) {
-  if (typeof data === 'string') data = JSON.parse(data);
-  const raw = data._raw ? JSON.parse(data._raw) : {};
+function df(label, val, opts={}) {
+  if (!val && !opts.showEmpty && !opts.field) return '';
+  const displayVal = val || '—';
+  const cls = `df${opts.full?' full':''}${opts.highlight?' highlight':''}${opts.field&&isEditMode?' editing':''}`;
+  const valCls = `df-val${!val?' empty':''}${opts.valCls?' '+opts.valCls:''}`;
 
-  document.getElementById('dpMat').textContent    = data.mat || '—';
-  document.getElementById('dpModelo').textContent = data.modelo || '';
+  // In edit mode, render editable input if a field key is provided
+  if (opts.field && isEditMode) {
+    const fieldKey = opts.field.toUpperCase();
+    const currentVal = currentRaw[fieldKey] || '';
+    if (opts.select) {
+      const options = opts.select.map(o =>
+        `<option value="${o}" ${currentVal===o?'selected':''}>${o}</option>`
+      ).join('');
+      return `<div class="${cls}"><div class="df-label">${label}</div>
+        <select class="df-select" data-field="${fieldKey}"><option value="">(vacío)</option>${options}</select></div>`;
+    }
+    if (opts.textarea) {
+      return `<div class="${cls}"><div class="df-label">${label}</div>
+        <textarea class="df-input area" data-field="${fieldKey}" rows="3">${currentVal}</textarea></div>`;
+    }
+    return `<div class="${cls}"><div class="df-label">${label}</div>
+      <input class="df-input" type="${opts.type||'text'}" data-field="${fieldKey}" value="${currentVal.replace(/"/g,'&quot;')}"></div>`;
+  }
 
-  // Build body
-  let html = '';
+  return `<div class="${cls}"><div class="df-label">${label}</div><div class="${valCls}">${displayVal}</div></div>`;
+}
 
-  // Pills
-  html += `<div class="dp-pills">
-    ${tallerPill(data.taller)}
-    ${estadoPill(data.estado)}
-    ${data.fase ? `<span class="pill pg">${data.fase}</span>` : ''}
-  </div>`;
-
-  // Datos clave
-  html += `<div class="dp-section">
-    <div class="dp-section-title"><i class="ti ti-info-circle"></i>Información</div>
-    <div class="dp-grid">`;
-
-  const fields = [
-    ['OR / Orden',      col(raw,'OR','NUM OR','Nº OR','NÚMERO OR')],
-    ['Operario',        col(raw,'OPERARIO','OPERARIO ASIGNADO')],
-    ['Propietario',     col(raw,'PROPIETARIO','CLIENTE','NOMBRE')],
-    ['Matrícula',       data.mat],
-    ['Fecha entrada',   col(raw,'FECHA ENTRADA','FECHA APERTURA','F.ENTRADA')],
-    ['Entrega prevista',col(raw,'FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA')],
-    ['VIN / Bastidor',  col(raw,'VIN','BASTIDOR','VIN/BASTIDOR')],
-    ['Km',              col(raw,'KM','KILÓMETROS','KILOMETROS')],
-    ['Seguro / Peritación', col(raw,'SEGURO','ASEGURADORA','PERITACION','PERITACIÓN')],
-    ['Observaciones',   col(raw,'OBSERVACIONES','NOTAS','OBS')],
-  ];
-
-  for (const [label, val] of fields) {
-    if (!val) continue;
-    const isLong = val.length > 30;
-    html += `<div class="dp-field ${isLong?'full':''}">
-      <div class="dp-field-label">${label}</div>
-      <div class="dp-field-val">${val}</div>
+function dateRow(label, val, dotCls='grey', fieldKey='') {
+  // In edit mode, show date input if fieldKey provided
+  if (fieldKey && isEditMode) {
+    const currentVal = currentRaw[fieldKey.toUpperCase()] || '';
+    return `<div class="date-item" style="flex-direction:column;align-items:flex-start;gap:3px">
+      <div style="display:flex;align-items:center;gap:7px;width:100%">
+        <div class="date-dot ${val ? dotCls : 'grey'}"></div>
+        <div class="date-label" style="font-size:9px;color:#555">${label}</div>
+      </div>
+      <input class="df-input" type="text" data-field="${fieldKey.toUpperCase()}" value="${currentVal.replace(/"/g,'&quot;')}" placeholder="dd/mm/aaaa" style="width:100%">
     </div>`;
   }
-  html += `</div></div>`;
+  return `<div class="date-item">
+    <div class="date-dot ${val ? dotCls : 'grey'}"></div>
+    <div class="date-label">${label}</div>
+    <div class="date-val ${val?'':'empty'}">${val || 'Sin fecha'}</div>
+  </div>`;
+}
 
-  // Links
-  const linkOR    = col(raw,'LINK OR','LINK_OR','ENLACE OR');
-  const linkDrive = col(raw,'LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK CARPETA DRIVE','LINK_CARPETA_DRIVE');
-  const linkPer   = col(raw,'LINK PERITACION','LINK_PERITACION','PERITACIÓN LINK','ENLACE PERITACION');
-  const fotosAlb  = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN');
-  const trelloCardId = extractTrelloId(fotosAlb);
+function section(icon, title, content) {
+  if (!content.trim()) return '';
+  return `<div class="ds"><div class="ds-title"><i class="ti ${icon}"></i>${title}</div>${content}</div>`;
+}
 
-  if (linkOR || linkDrive || linkPer || trelloCardId || data.taller) {
-    html += `<div class="dp-section">
-      <div class="dp-section-title"><i class="ti ti-link"></i>Accesos directos</div>`;
+function openDetail(rawArg, editModeOverride) {
+  const raw = typeof rawArg === 'string' ? JSON.parse(rawArg) : rawArg;
+  // Store for save/cancel
+  if (editModeOverride === undefined) {
+    currentRaw = raw;
+    isEditMode = false;
+  } else {
+    isEditMode = editModeOverride;
+  }
+  // Toggle edit UI
+  document.getElementById('editBar').classList.toggle('hidden', isEditMode);
+  document.getElementById('saveBar').classList.toggle('hidden', !isEditMode);
+  document.getElementById('editBadge').classList.toggle('hidden', !isEditMode);
 
-    if (trelloCardId) {
-      html += `<a class="link-btn trello" href="https://trello.com/c/${trelloCardId}" target="_blank">
-        <i class="ti ti-brand-trello"></i>
-        Ver tarjeta Trello
-      </a>`;
-    } else if (data.taller) {
-      const bId = TRELLO_BOARDS[data.taller.toUpperCase()] || (data.taller.toUpperCase()==='JM' ? TRELLO_BOARDS.JM : TRELLO_BOARDS.RM);
-      if (bId) html += `<a class="link-btn trello" href="https://trello.com/b/${bId}" target="_blank">
-        <i class="ti ti-brand-trello"></i>
-        Tablero Trello ${data.taller.toUpperCase()}
-      </a>`;
-    }
+  const mat    = col(raw,'MATRICULA','MATRÍCULA') || '—';
+  const modelo = col(raw,'MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO');
+  const taller = (col(raw,'TALLER') || raw._TALLER || '').toUpperCase();
+  const estado = col(raw,'ESTADO','STATUS','ESTADO EXPEDIENTE');
+  const fase   = col(raw,'FASE','FASE REPARACION','FASE REPARACIÓN');
+  const oper   = col(raw,'OPERARIO','OPERARIO ASIGNADO');
+  const orNum  = col(raw,'OR','NUM OR','Nº OR','NÚMERO OR','OR NUM');
 
-    if (linkDrive) html += `<a class="link-btn drive" href="${linkDrive}" target="_blank">
-      <i class="ti ti-brand-google-drive"></i>Carpeta Drive</a>`;
-    if (linkOR) html += `<a class="link-btn doc" href="${linkOR}" target="_blank">
-      <i class="ti ti-file-description"></i>Orden de Reparación</a>`;
-    if (linkPer) html += `<a class="link-btn doc" href="${linkPer}" target="_blank">
-      <i class="ti ti-file-invoice"></i>Peritación</a>`;
+  document.getElementById('dpMat').textContent    = mat;
+  document.getElementById('dpModelo').textContent = modelo || '';
 
-    html += `</div>`;
+  let html = '';
+
+  // Banner si el expediente está cerrado/facturado
+  if (isCerrada(raw)) {
+    const reason = raw._trelloClosed ? 'Tarjeta archivada en Trello' : 'Expediente facturado / cerrado';
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#111827;border:1px solid #374151;border-radius:8px;margin-bottom:8px">
+      <i class="ti ti-lock" style="color:#6b7280;font-size:16px;flex-shrink:0"></i>
+      <div>
+        <div style="font-size:10px;color:#6b7280;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Expediente cerrado</div>
+        <div style="font-size:11px;color:#9ca3af">${reason}</div>
+      </div>
+    </div>`;
   }
 
-  // Recambios
-  const recForCar = allRec.filter(rec => {
-    const rm = col(rec,'MATRICULA','MATRÍCULA','OR','MATRICULA/OR');
-    return rm && (rm.toUpperCase() === data.mat.toUpperCase() || rm === col(raw,'OR','NUM OR'));
+  const ESTADOS = ['EN PROCESO','PENDIENTE','PRESUPUESTO','TERMINADO','ENTREGADO','EN ESPERA','PARADO','FACTURADO','CERRADO'];
+  const FASES   = ['Peritación','Chapa','Pintura','Montaje','Control calidad','Mecánica','Entrega','Facturación'];
+
+  // ── SECCIÓN 1: Estado actual ──────────────────
+  const estadoHtml = `
+    <div class="ds-grid">
+      ${df('Taller', taller ? tallerPill(taller) : '', {highlight: !!taller})}
+      ${df('Estado', estado ? estadoPill(estado) : '', {showEmpty: true, field:'ESTADO', select: ESTADOS})}
+      ${df('Fase', fase||'', {field:'FASE', select: FASES})}
+      ${df('Operario', oper||'', {field:'OPERARIO'})}
+    </div>`;
+  html += section('ti-dashboard', 'Estado actual', estadoHtml);
+
+  // ── SECCIÓN 2: Trello & documentos ───────────
+  const fotosAlb     = col(raw,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO');
+  const trelloCardId = extractTrelloId(fotosAlb);
+  const linkOR       = col(raw,'LINK OR','LINK_OR','ENLACE OR','OR LINK','LINK ORDEN');
+  const linkDrive    = col(raw,
+    'LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK CARPETA DRIVE','LINK_CARPETA_DRIVE',
+    'CARPETA','DRIVE','LINK DRIVE','ENLACE DRIVE','FOTOS','LINK FOTOS','FOTOS DRIVE',
+    'CARPETA FOTOS','FOTOS REPARACION','FOTOS REPARACIÓN','FOTOS PERITACION','FOTOS PERITACIÓN',
+    'GOOGLE DRIVE','LINK GOOGLE DRIVE','ENLACE CARPETA','CARPETA GOOGLE DRIVE',
+    'LINK_FOTOS','CARPETA_DRIVE','LINK_CARPETA_FOTOS','FOTOS_DRIVE',
+  );
+  const linkPer      = col(raw,
+    'LINK PERITACION','LINK_PERITACION','PERITACIÓN LINK','ENLACE PERITACION','LINK PERITACIÓN',
+    'PERITACION','PERITACIÓN','INFORME PERITO','LINK INFORME','VALORACION','VALORACIÓN',
+    'LINK VALORACION','LINK VALORACIÓN',
+  );
+
+  let linksHtml = '<div class="link-row">';
+  if (trelloCardId) {
+    linksHtml += `<a class="lbtn trello" href="https://trello.com/c/${trelloCardId}" target="_blank">
+      <i class="ti ti-brand-trello"></i>
+      <div><div>Ver tarjeta Trello</div><div class="lbtn-sub">Tarjeta directa del expediente</div></div>
+    </a>`;
+  } else {
+    const bId = TRELLO_BOARDS[taller];
+    if (bId) linksHtml += `<a class="lbtn trello" href="https://trello.com/b/${bId}" target="_blank">
+      <i class="ti ti-brand-trello"></i>
+      <div><div>Tablero Trello ${taller}</div><div class="lbtn-sub">No hay tarjeta directa – abre el tablero</div></div>
+    </a>`;
+  }
+  if (linkDrive) linksHtml += `<a class="lbtn drive" href="${linkDrive}" target="_blank">
+    <i class="ti ti-brand-google-drive"></i>
+    <div><div>Carpeta Drive</div><div class="lbtn-sub">Documentación del expediente</div></div>
+  </a>`;
+  if (linkOR) linksHtml += `<a class="lbtn doc" href="${linkOR}" target="_blank">
+    <i class="ti ti-file-description"></i>
+    <div><div>Orden de Reparación</div><div class="lbtn-sub">OR ${orNum||mat}</div></div>
+  </a>`;
+  if (linkPer) linksHtml += `<a class="lbtn perit" href="${linkPer}" target="_blank">
+    <i class="ti ti-file-certificate"></i>
+    <div><div>Peritación</div><div class="lbtn-sub">Informe del perito</div></div>
+  </a>`;
+  linksHtml += '</div>';
+
+  if (trelloCardId || linkOR || linkDrive || linkPer || TRELLO_BOARDS[taller]) {
+    html += section('ti-link', 'Trello y documentos', linksHtml);
+  }
+
+  // ── SECCIÓN: Trello live (carga asíncrona) ─
+  if (trelloCardId && !isEditMode) {
+    html += `<div class="ds" id="trello-section">
+      <div class="trello-loading"><i class="ti ti-loader"></i>Cargando Trello…</div>
+    </div>`;
+  }
+
+  // ── SECCIÓN 3: Fechas clave ───────────────────
+  const fEntrada   = col(raw,'FECHA ENTRADA','F.ENTRADA','FECHA DE ENTRADA','FECHA APERTURA');
+  const fOR        = col(raw,'FECHA APERTURA OR','APERTURA OR','FECHA OR','F.OR','FECHA APERTURA');
+  const fPerit     = col(raw,'FECHA PERITACION','FECHA PERITACIÓN','F.PERITACION','RECIBIDA PERITACION','PERITACION RECIBIDA','FECHA RECEPCION PERITACION');
+  const fCita      = col(raw,'CITA','FECHA CITA','PROXIMA CITA','PRÓXIMA CITA','F.CITA','FECHA PROXIMA CITA');
+  const fEntrega   = col(raw,'FECHA ENTREGA','FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA');
+  const fReal      = col(raw,'FECHA ENTREGA REAL','ENTREGA REAL','F.ENTREGA REAL');
+
+  const fechasHtml = `
+    ${dateRow('Entrada en taller', fEntrada, 'blue', 'FECHA ENTRADA')}
+    ${dateRow('Apertura OR', fOR || fEntrada, 'blue', 'FECHA APERTURA OR')}
+    ${dateRow('Peritación recibida', fPerit, 'amber', 'FECHA PERITACION')}
+    ${dateRow('Próxima cita', fCita, 'amber', 'CITA')}
+    ${dateRow('Entrega prevista', fEntrega, 'green', 'FECHA PREVISTA ENTREGA')}
+    ${(fReal || isEditMode) ? dateRow('Entrega real', fReal, 'green', 'FECHA ENTREGA REAL') : ''}
+  `;
+  html += section('ti-calendar-event', 'Fechas clave', fechasHtml);
+
+  // ── SECCIÓN 4: Vehículo ───────────────────────
+  const vin  = col(raw,'VIN','BASTIDOR','VIN/BASTIDOR','Nº BASTIDOR','NUM BASTIDOR');
+  const km   = col(raw,'KM','KILÓMETROS','KILOMETROS','KMS');
+  const col2 = col(raw,'COLOR','COLOUR');
+  const prop = col(raw,'PROPIETARIO','CLIENTE','NOMBRE','NOMBRE CLIENTE','NOMBRE PROPIETARIO')
+             || (cita ? cita['Cliente'] || '' : '');
+  const tel  = col(raw,'TELEFONO','TELÉFONO','TEL','MÓVIL','MOVIL','TLF')
+             || (cita ? cita['Teléfono'] || cita['TELEFONO'] || '' : '');
+  const email= col(raw,'EMAIL','CORREO','CORREO ELECTRONICO','CORREO ELECTRÓNICO','MAIL');
+
+  let vehiculoHtml = `<div class="ds-grid">
+    ${df('Matrícula', mat, {valCls:'big', field:'MATRICULA'})}
+    ${df('Modelo', modelo||'', {field:'MODELO'})}
+    ${df('VIN / Bastidor', vin||'', {full: true, field:'VIN'})}
+    ${df('Kilómetros', km||'', {field:'KM'})}
+    ${df('Color', col2||'', {field:'COLOR'})}
+    ${df('Cliente / Propietario', prop||'', {full: true, field:'PROPIETARIO'})}
+    ${df('Teléfono', tel ? (isEditMode ? tel : `<a href="tel:${tel}" style="color:#93c5fd;display:flex;align-items:center;gap:4px"><i class="ti ti-phone" style="font-size:12px"></i>${tel}</a>`) : '', {field:'TELEFONO'})}
+    ${email ? df('Email', isEditMode ? email : `<a href="mailto:${email}" style="color:#93c5fd">${email}</a>`, {full:true, field:'EMAIL'}) : ''}
+  </div>`;
+  // Badge de fuente CITAS si el dato vino de ahí
+  if (cita && !prop && (cita['Cliente']||cita['Teléfono'])) {
+    vehiculoHtml += `<div style="font-size:9px;color:#3b82f6;text-align:right;margin-top:4px"><i class="ti ti-table-import" style="margin-right:3px"></i>Datos cliente desde CITAS</div>`;
+  }
+  html += section('ti-car', 'Vehículo', vehiculoHtml);
+
+  // ── SECCIÓN 5: Siniestro / Seguro ────────────
+  const sinNum  = col(raw,'NUM SINIESTRO','SINIESTRO','Nº SINIESTRO','NUMERO SINIESTRO','NUM. SINIESTRO','REFERENCIA SINIESTRO','REF SINIESTRO');
+  const aseg    = col(raw,'ASEGURADORA','COMPAÑIA','COMPAÑÍA','SEGURO','CIAS','CIA SEGUROS','COMPAÑIA SEGURO');
+  const perito  = col(raw,'PERITO','NOMBRE PERITO','PERITADOR');
+  const tiperit = col(raw,'TIPO SINIESTRO','TIPO PERITACION','TIPO PERITACIÓN','TIPO');
+  const poliza  = col(raw,'POLIZA','PÓLIZA','NUM POLIZA','Nº POLIZA');
+
+  if (sinNum || aseg || perito || tiperit || poliza || isEditMode) {
+    const sinHtml = `<div class="ds-grid">
+      ${df('Nº Siniestro', sinNum||'', {full: true, highlight: true, valCls:'big', field:'NUM SINIESTRO'})}
+      ${df('Aseguradora',  aseg||'',   {field:'ASEGURADORA'})}
+      ${df('Perito',       perito||'', {field:'PERITO'})}
+      ${df('Tipo',         tiperit||'',{field:'TIPO SINIESTRO'})}
+      ${df('Póliza',       poliza||'', {field:'POLIZA'})}
+    </div>`;
+    html += section('ti-shield-check', 'Siniestro / Seguro', sinHtml);
+  }
+
+  // ── Buscar cita vinculada en CITAS sheet ─────
+  const cita = allCitas.find(c => {
+    const cOr  = (c['OR'] || c['OR '] || '').toUpperCase().replace(/\s/g,'');
+    const cMat = (c['Matrícula'] || c['MATRICULA'] || '').toUpperCase().replace(/\s/g,'');
+    const cTrello = (c['Trello Card ID'] || '').trim();
+    if (orUP  && cOr  && cOr  === orUP)  return true;
+    if (matUP && cMat && cMat === matUP) return true;
+    if (cTrello && trelloCardId && cTrello === trelloCardId) return true;
+    return false;
   });
 
-  html += `<div class="dp-section">
-    <div class="dp-section-title"><i class="ti ti-package"></i>Recambios (${recForCar.length})</div>`;
+  // ── SECCIÓN 6: OR ────────────────────────────
+  if (orNum) {
+    const citaOper = cita ? (cita['OPERARIO'] || '') : '';
+    const citaGrupo= cita ? (cita['Grupo Reparación'] || cita['GRUPO REPARACION'] || '') : '';
+    const citaTipo = cita ? (cita['Tipo Avería'] || cita['TIPO AVERIA'] || '') : '';
+    const citaPrio = cita ? (cita['Prioridad'] || cita['PRIORIDAD'] || '') : '';
+    const orHtml = `<div class="ds-grid">
+      ${df('Nº OR', orNum, {highlight: true, valCls:'big'})}
+      ${df('Operario', citaOper || oper || '', {field:'OPERARIO'})}
+      ${citaGrupo ? df('Grupo reparación', citaGrupo) : ''}
+      ${citaTipo  ? df('Tipo avería', citaTipo) : ''}
+      ${citaPrio  ? df('Prioridad', citaPrio) : ''}
+    </div>`;
+    html += section('ti-tools', 'Orden de Reparación', orHtml);
+  }
 
+  // ── SECCIÓN: Horas (de CITAS sheet) ──────────
+  if (cita && !isEditMode) {
+    const hPres = parseFloat((cita['H.Presupuestadas'] || '0').replace(',','.')) || 0;
+    const hChap = parseFloat((cita['H.Chapa']  || '0').replace(',','.')) || 0;
+    const hPint = parseFloat((cita['H.Pintura'] || '0').replace(',','.')) || 0;
+    const hCab  = parseFloat((cita['H.Cabina']  || '0').replace(',','.')) || 0;
+    const hBaremo = cita['Baremo'] || '';
+    const phases = [
+      { label: 'Chapa',   val: hChap, color: '#f97316' },
+      { label: 'Pintura', val: hPint, color: '#8b5cf6' },
+      { label: 'Cabina',  val: hCab,  color: '#3b82f6' },
+    ].filter(p => p.val > 0);
+    const maxPhase = Math.max(...phases.map(p => p.val), hPres * 0.01);
+
+    if (hPres > 0 || phases.length > 0) {
+      let horasHtml = `<div class="horas-wrap">
+        <div class="horas-total">
+          <div>
+            <div class="horas-total-lbl">Horas presupuestadas</div>
+            <div class="horas-total-num">${hPres}h</div>
+          </div>
+          ${hBaremo ? `<div style="text-align:right"><div style="font-size:9px;color:#3b82f6;text-transform:uppercase">Baremo</div><div style="font-size:13px;font-weight:700;color:#93c5fd">${hBaremo}</div></div>` : ''}
+        </div>`;
+
+      if (phases.length) {
+        horasHtml += `<div class="horas-phases">`;
+        for (const p of phases) {
+          const pct = hPres > 0 ? Math.min(100, (p.val / hPres) * 100) : 100;
+          horasHtml += `<div class="horas-row">
+            <div class="horas-lbl">${p.label}</div>
+            <div class="horas-bar-bg"><div class="horas-bar-fill" style="width:${pct}%;background:${p.color}"></div></div>
+            <div class="horas-val">${p.val}h</div>
+          </div>`;
+        }
+        horasHtml += `</div>`;
+      }
+      horasHtml += `<div class="horas-fichajes-note"><i class="ti ti-clock-pause" style="margin-right:4px"></i>Horas reales: integración con app de fichajes pendiente</div>
+      </div>`;
+      html += section('ti-clock', 'Horas de trabajo', horasHtml);
+    }
+  }
+
+  // ── SECCIÓN 7: Recambios ──────────────────────
+  const matUP = mat.toUpperCase().replace(/\s/g,'');
+  const orUP  = orNum.toUpperCase().replace(/\s/g,'');
+  // How many expedientes share this plate? (to detect ambiguity)
+  const sameMatExp = allExp.filter(e =>
+    col(e,'MATRICULA','MATRÍCULA').toUpperCase().replace(/\s/g,'') === matUP
+  );
+  const matIsAmbiguous = sameMatExp.length > 1;
+
+  const recForCar = allRec.map(rec => {
+    const rMat = col(rec,'MATRICULA','MATRÍCULA','MATRICULA/OR','MAT').toUpperCase().replace(/\s/g,'');
+    const rOr  = col(rec,'OR','NUM OR','Nº OR','NÚMERO OR','OR NUM','N OR').toUpperCase().replace(/\s/g,'');
+    const rRef = col(rec,'EXPEDIENTE','REFERENCIA EXPEDIENTE','REF EXP','EXP').toUpperCase().replace(/\s/g,'');
+
+    // Priority 1: exact OR match → definite
+    if (orUP && rOr && rOr === orUP) return {...rec, _matchType:'OR'};
+    // Priority 2: OR field matches matricula (some sheets store mat in OR col)
+    if (orUP && rMat && rMat === orUP) return {...rec, _matchType:'OR'};
+    // Priority 3: plate match — only include if OR field is empty (unambiguous) OR plate is unique
+    if (rMat && rMat === matUP && !rOr) {
+      return {...rec, _matchType: matIsAmbiguous ? 'AMBIG' : 'MAT'};
+    }
+    if (rRef && (rRef===matUP || rRef===orUP)) return {...rec, _matchType:'REF'};
+    return null;
+  }).filter(Boolean)
+    .filter(r => r._matchType !== 'AMBIG' || !matIsAmbiguous || (r._matchType === 'AMBIG'));
+  // Keep ambiguous ones but flag them visually
+
+  const ambigRec = recForCar.filter(r => r._matchType === 'AMBIG');
+  let recHtml = '';
+  if (matIsAmbiguous && ambigRec.length) {
+    recHtml += `<div style="background:#431407;border:1px solid #78350f;border-radius:8px;padding:8px 11px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px">
+      <i class="ti ti-alert-triangle" style="color:#fbbf24;font-size:16px;flex-shrink:0;margin-top:1px"></i>
+      <div>
+        <div style="font-size:11px;color:#fbbf24;font-weight:700">Esta matrícula tiene ${sameMatExp.length} expedientes (ORs)</div>
+        <div style="font-size:10px;color:#d97706;margin-top:2px">${ambigRec.length} recambio${ambigRec.length>1?'s':''} solo tienen matrícula — pueden pertenecer a cualquier OR. Edítalos en el sheet añadiendo el número de OR.</div>
+        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${sameMatExp.map(e=>`<span style="font-size:10px;background:#78350f;color:#fbbf24;padding:2px 8px;border-radius:4px;font-weight:600">${col(e,'OR','NUM OR','Nº OR')||'Sin OR'}</span>`).join('')}</div>
+      </div>
+    </div>`;
+  }
   if (!recForCar.length) {
-    html += `<div class="rec-empty">Sin recambios registrados para este expediente</div>`;
+    recHtml += `<div class="df full"><div class="df-val empty">Sin recambios registrados</div></div>`;
   } else {
+    recHtml += '<div class="rec-list">';
     for (const rc of recForCar) {
       const desc = col(rc,'DESCRIPCION','DESCRIPCIÓN','ARTICULO','ARTÍCULO','PIEZA','REFERENCIA','REF');
       const ref  = col(rc,'REFERENCIA','REF','CÓDIGO','CODIGO');
@@ -558,84 +1162,673 @@ function openDetail(data) {
       const cant = col(rc,'CANTIDAD','CANT','UNIDADES');
       const alb  = col(rc,'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN');
       const trcId= extractTrelloId(alb);
-
-      let estCls = '';
+      let rowCls = 'pend';
       if (est) {
         const eu = est.toUpperCase();
-        if (eu.includes('LLEG') || eu.includes('RECIB') || eu.includes('OK'))       estCls='est-pv';
-        else if (eu.includes('PEDIDO') || eu.includes('ESPERA'))                    estCls='est-pa';
-        else if (eu.includes('FALTA') || eu.includes('URGENTE'))                    estCls='est-pe';
-        else if (eu.includes('DEVOL') || eu.includes('INCIDENCIA'))                 estCls='est-pr';
+        if (eu.includes('LLEG') || eu.includes('RECIB') || eu.includes('OK')) rowCls='ok';
+        else if (eu.includes('FALTA') || eu.includes('URGENT'))               rowCls='urg';
+        else if (eu.includes('INFO') || eu.includes('DEVOL'))                 rowCls='info';
       }
-
-      html += `<div class="rec-item ${estCls}">
-        <div class="rec-desc">${desc || ref || 'Recambio sin descripción'}</div>
-        <div class="rec-meta">
+      recHtml += `<div class="rec-row ${rowCls}">
+        <div class="rec-name">${desc || ref || '—'}</div>
+        <div class="rec-sub">
           ${ref && ref!==desc ? `<span><i class="ti ti-hash"></i><b>${ref}</b></span>` : ''}
           ${cant  ? `<span><i class="ti ti-number"></i><b>${cant}</b></span>` : ''}
           ${prov  ? `<span><i class="ti ti-building-store"></i><b>${prov}</b></span>` : ''}
           ${est   ? `<span><i class="ti ti-circle-dot"></i><b>${est}</b></span>` : ''}
           ${fPed  ? `<span><i class="ti ti-calendar-plus"></i>${fPed}</span>` : ''}
-          ${fLleg ? `<span><i class="ti ti-calendar-check"></i>${fLleg}</span>` : ''}
+          ${fLleg ? `<span><i class="ti ti-calendar-check" style="color:#22c55e"></i>${fLleg}</span>` : ''}
           ${trcId ? `<span><a href="https://trello.com/c/${trcId}" target="_blank" style="color:#579dff;text-decoration:none;display:flex;align-items:center;gap:3px"><i class="ti ti-brand-trello"></i>Trello</a></span>` : ''}
         </div>
       </div>`;
     }
+    recHtml += '</div>';
   }
-  html += `</div>`;
+  html += section('ti-package', `Recambios (${recForCar.length})`, recHtml);
 
-  // Pedidos
+  // ── SECCIÓN 8: Pedidos ────────────────────────
   const pedForCar = allPed.filter(p => {
-    const pm = col(p,'MATRICULA','MATRÍCULA','OR');
-    return pm && (pm.toUpperCase() === data.mat.toUpperCase() || pm === col(raw,'OR','NUM OR'));
+    const pMat = col(p,'MATRICULA','MATRÍCULA','MATRICULA/OR','MAT').toUpperCase().replace(/\s/g,'');
+    const pOr  = col(p,'OR','NUM OR','Nº OR','NÚMERO OR','OR NUM').toUpperCase().replace(/\s/g,'');
+    const pRef = col(p,'EXPEDIENTE','REF EXP','EXP').toUpperCase().replace(/\s/g,'');
+    return (pMat && (pMat===matUP || pMat===orUP)) ||
+           (pOr  && (pOr===orUP  || pOr===matUP)) ||
+           (pRef && (pRef===matUP || pRef===orUP));
   });
 
   if (pedForCar.length) {
-    html += `<div class="dp-section">
-      <div class="dp-section-title"><i class="ti ti-truck-delivery"></i>Pedidos (${pedForCar.length})</div>`;
+    let pedHtml = '<div class="rec-list">';
     for (const p of pedForCar) {
       const desc = col(p,'DESCRIPCION','DESCRIPCIÓN','ARTICULO','PIEZA','REFERENCIA');
       const est  = col(p,'ESTADO','STATUS');
       const prov = col(p,'PROVEEDOR');
       const fPed = col(p,'FECHA','FECHA PEDIDO');
-      html += `<div class="rec-item">
-        <div class="rec-desc">${desc || 'Pedido'}</div>
-        <div class="rec-meta">
+      pedHtml += `<div class="rec-row pend">
+        <div class="rec-name">${desc || 'Pedido'}</div>
+        <div class="rec-sub">
           ${prov ? `<span><i class="ti ti-building-store"></i><b>${prov}</b></span>` : ''}
           ${est  ? `<span><i class="ti ti-circle-dot"></i><b>${est}</b></span>` : ''}
           ${fPed ? `<span><i class="ti ti-calendar-plus"></i>${fPed}</span>` : ''}
         </div>
       </div>`;
     }
+    pedHtml += '</div>';
+    html += section('ti-truck-delivery', `Pedidos (${pedForCar.length})`, pedHtml);
+  }
+
+  // ── SECCIÓN 9: Observaciones ──────────────────
+  const obs = col(raw,'OBSERVACIONES','NOTAS','OBS','NOTA','COMENTARIO','COMENTARIOS');
+  if (obs || isEditMode) {
+    const obsHtml = isEditMode
+      ? df('Observaciones / Notas', obs||'', {full:true, field:'OBSERVACIONES', textarea:true})
+      : `<div class="df full"><div class="df-val" style="white-space:pre-wrap;font-size:12px;line-height:1.5">${obs}</div></div>`;
+    html += section('ti-notes', 'Observaciones', obsHtml);
+  }
+
+  // ── SECCIÓN: Timeline compacto ────────────
+  if (!isEditMode) {
+    const pasosDelCoche = allPasos.filter(p => {
+      const pm = (p.MATRICULA||'').toUpperCase();
+      const po = (p.OR||'').toUpperCase();
+      return (pm && pm === mat.toUpperCase()) || (po && po === orNum.toUpperCase());
+    });
+
+    let tlHtml = `<button class="tl-add-btn" onclick="openPasoModal()">
+      <i class="ti ti-plus"></i> Añadir paso
+    </button>`;
+
+    if (!pasosDelCoche.length) {
+      tlHtml += `<div class="tl-empty">Sin pasos registrados todavía</div>`;
+    } else {
+      // Último paso — card destacada
+      const last = pasosDelCoche[0];
+      const lstTipo = last.TIPO || 'NOTA';
+      const lstSt   = STEP_TYPES.find(s => s.key === lstTipo) || STEP_TYPES[STEP_TYPES.length-1];
+      const lstDesc = last.DESCRIPCION || last['DESCRIPCIÓN'] || '';
+      const lstUser = last.USUARIO || '';
+      const lstFecha= last.FECHA || '';
+      const lstLink = last.LINK || '';
+      tlHtml += `<div class="tl-last">
+        <div class="tl-last-top">
+          <div class="tl-last-icon" style="background:${lstSt.color}22">
+            <i class="ti ${lstSt.icon}" style="color:${lstSt.color};font-size:14px"></i>
+          </div>
+          <span class="tl-last-type" style="color:${lstSt.color}">${lstSt.label}</span>
+          <span class="tl-last-date">${lstFecha}</span>
+        </div>
+        ${lstDesc ? `<div class="tl-last-desc">${lstDesc}</div>` : ''}
+        ${lstLink ? `<a class="tl-link" href="${lstLink}" target="_blank" style="margin-left:36px;margin-top:4px;display:inline-flex"><i class="ti ti-external-link"></i>Ver documento</a>` : ''}
+        ${lstUser ? `<div class="tl-last-user"><i class="ti ti-user" style="margin-right:3px"></i>${lstUser}</div>` : ''}
+      </div>`;
+
+      // Pasos anteriores — chips compactos
+      const prev = pasosDelCoche.slice(1);
+      if (prev.length) {
+        tlHtml += `<div class="tl-chips">`;
+        for (const p of prev) {
+          const tipo = p.TIPO || 'NOTA';
+          const st   = STEP_TYPES.find(s => s.key === tipo) || STEP_TYPES[STEP_TYPES.length-1];
+          const f    = p.FECHA ? p.FECHA.split(' ')[0] : '';
+          const title= (p.DESCRIPCION || p['DESCRIPCIÓN'] || st.label).replace(/"/g,'&quot;');
+          tlHtml += `<div class="tl-chip" title="${title}" style="border-color:${st.color}22">
+            <i class="ti ${st.icon}" style="color:${st.color}"></i>
+            <span style="color:#888">${st.label.length > 14 ? st.label.slice(0,13)+'…' : st.label}</span>
+            ${f ? `<span class="tl-chip-date">${f}</span>` : ''}
+          </div>`;
+        }
+        tlHtml += `</div>`;
+      }
+    }
+    html += section('ti-timeline', `Proceso${pasosDelCoche.length ? ` · ${pasosDelCoche.length} pasos` : ''}`, tlHtml);
+  }
+
+  // ── SECCIÓN 10: Resto de campos (collapsible) ──
+  const shownKeys = new Set([
+    'MATRICULA','MATRÍCULA','MODELO','MARCA','MARCA/MODELO','TALLER','ESTADO','STATUS','FASE',
+    'OPERARIO','OPERARIO ASIGNADO','OR','NUM OR','Nº OR','NÚMERO OR','OR NUM',
+    'FECHA ENTRADA','F.ENTRADA','FECHA DE ENTRADA','FECHA APERTURA',
+    'FECHA APERTURA OR','APERTURA OR','FECHA OR','F.OR',
+    'FECHA PERITACION','FECHA PERITACIÓN','F.PERITACION','PERITACION RECIBIDA',
+    'CITA','FECHA CITA','PROXIMA CITA','PRÓXIMA CITA','F.CITA',
+    'FECHA ENTREGA','FECHA PREVISTA ENTREGA','FECHA ENTREGA PREVISTA','FECHA PREVISTA','F.ENTREGA',
+    'FECHA ENTREGA REAL','ENTREGA REAL',
+    'VIN','BASTIDOR','VIN/BASTIDOR','Nº BASTIDOR','NUM BASTIDOR',
+    'KM','KILÓMETROS','KILOMETROS','KMS','COLOR','COLOUR',
+    'PROPIETARIO','CLIENTE','NOMBRE','NOMBRE CLIENTE','NOMBRE PROPIETARIO',
+    'TELEFONO','TELÉFONO','TEL','MÓVIL','MOVIL','TLF',
+    'NUM SINIESTRO','SINIESTRO','Nº SINIESTRO','NUMERO SINIESTRO','REFERENCIA SINIESTRO',
+    'ASEGURADORA','COMPAÑIA','COMPAÑÍA','SEGURO','CIAS','CIA SEGUROS',
+    'PERITO','NOMBRE PERITO','PERITADOR','TIPO SINIESTRO','TIPO PERITACION','TIPO',
+    'POLIZA','PÓLIZA','NUM POLIZA','Nº POLIZA',
+    'LINK OR','LINK_OR','ENLACE OR','LINK CARPETA','LINK_CARPETA','CARPETA DRIVE','LINK_CARPETA_DRIVE',
+    'LINK PERITACION','LINK_PERITACION','ENLACE PERITACION','LINK PERITACIÓN',
+    'FOTO ALBARAN','FOTO_ALBARAN','ALBARAN','ALBARÁN','LINK TRELLO',
+    'OBSERVACIONES','NOTAS','OBS','NOTA','COMENTARIO','COMENTARIOS',
+    '_TALLER','VEHICULO','VEHÍCULO','MARCA / MODELO',
+    'RECIBIDA PERITACION','FECHA RECEPCION PERITACION',
+  ]);
+  const extras = Object.entries(raw).filter(([k,v]) => v && !shownKeys.has(k) && !k.startsWith('_'));
+
+  if (extras.length) {
+    let extraHtml = `<div class="ds-grid">`;
+    for (const [k,v] of extras) {
+      const isUrl = v.startsWith('http');
+      const display = isUrl
+        ? `<a href="${v}" target="_blank" style="color:#93c5fd;word-break:break-all">${v.length>40?v.slice(0,40)+'…':v}</a>`
+        : v;
+      extraHtml += df(k, display, {full: v.length > 25});
+    }
+    extraHtml += `</div>`;
+    html += `<div class="ds">
+      <div class="ds-title" style="cursor:pointer" onclick="this.parentElement.querySelector('.extra-body').style.display==='none'?this.parentElement.querySelector('.extra-body').style.display='':this.parentElement.querySelector('.extra-body').style.display='none'">
+        <i class="ti ti-dots"></i>Más campos (${extras.length}) <i class="ti ti-chevron-down" style="margin-left:auto;font-size:11px"></i>
+      </div>
+      <div class="extra-body" style="display:none">${extraHtml}</div>
+    </div>`;
+  }
+
+  document.getElementById('dpBody').innerHTML = html;
+  const overlay = document.getElementById('detailOverlay');
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+
+  // Load Trello data asynchronously after DOM is ready
+  if (trelloCardId && !isEditMode) {
+    loadTrelloSection(trelloCardId);
+  }
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════
+//  TRELLO API
+// ═══════════════════════════════════════════
+async function fetchTrelloCard(cardId) {
+  const base = `https://api.trello.com/1/cards/${cardId}`;
+  const auth = `key=${TRELLO_KEY}&token=${TRELLO_TOKEN}`;
+  const url  = `${base}?${auth}&fields=name,desc,url,due,dueComplete,idList,labels,closed,cover&checklists=all&checklist_fields=name,checkItems&actions=commentCard,updateCard&action_fields=data,date,memberCreator&action_limit=30&customFieldItems=true&attachments=true&attachment_fields=url,name,mimeType,previews,isUpload,bytes`;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`Trello HTTP ${res.status}`);
+  const card = await res.json();
+
+  // Also fetch the list name (= current work phase)
+  if (card.idList) {
+    try {
+      const lr = await fetch(`https://api.trello.com/1/lists/${card.idList}?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}&fields=name`);
+      if (lr.ok) { const l = await lr.json(); card._listName = l.name; }
+    } catch(e) {}
+  }
+  return card;
+}
+
+function fmtTrelloDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function renderTrello(card) {
+  const el = document.getElementById('trello-section');
+  if (!el) return;
+
+  let html = `<div class="ds-title"><i class="ti ti-brand-trello" style="color:#579dff"></i>Trello — ${card.name}</div>`;
+
+  // ── Cover image ────────────────────────────
+  const attachments = card.attachments || [];
+  const coverId = card.cover?.idAttachment;
+  if (coverId) {
+    const coverAtt = attachments.find(a => a.id === coverId || a.url?.includes(coverId));
+    const coverUrl = coverAtt?.previews?.sort((a,b) => b.width - a.width)[0]?.url || coverAtt?.url;
+    if (coverUrl) {
+      html += `<div class="trello-cover"><img src="${coverUrl}" alt="Cover" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`;
+    }
+  } else if (card.cover?.color) {
+    const coverColors = {blue:'#0c4a6e',green:'#14532d',orange:'#7c2d12',red:'#7f1d1d',purple:'#4c1d95',pink:'#831843',sky:'#0c4a6e',lime:'#14532d',yellow:'#78350f',black:'#111'};
+    html += `<div class="trello-cover" style="height:40px;background:${coverColors[card.cover.color]||'#1a1a1a'}"></div>`;
+  }
+
+  // ── Imágenes adjuntas ──────────────────────
+  const imgAttachments = attachments.filter(a => a.mimeType?.startsWith('image/') && a.id !== coverId);
+  if (imgAttachments.length) {
+    html += `<div class="trello-img-grid">`;
+    for (const img of imgAttachments.slice(0, 6)) {
+      const thumb = img.previews?.sort((a,b) => a.width - b.width).find(p => p.width >= 150)?.url || img.url;
+      html += `<a class="trello-img-thumb" href="${img.url}" target="_blank" title="${img.name}">
+        <img src="${thumb}" alt="${img.name}" loading="lazy" onerror="this.style.display='none'">
+      </a>`;
+    }
+    html += `</div>`;
+    if (imgAttachments.length > 6) {
+      html += `<div style="font-size:10px;color:#555;text-align:center;margin:-2px 0 8px">+${imgAttachments.length-6} imágenes más en <a href="${card.url}" target="_blank" style="color:#579dff">Trello</a></div>`;
+    }
+  }
+
+  // ── Adjuntos no-imagen ─────────────────────
+  const fileAttachments = attachments.filter(a => !a.mimeType?.startsWith('image/'));
+  if (fileAttachments.length) {
+    html += `<div class="trello-attach-list">`;
+    for (const f of fileAttachments) {
+      const sizeKb = f.bytes ? `${Math.round(f.bytes/1024)} KB` : '';
+      html += `<a class="trello-attach-item" href="${f.url}" target="_blank">
+        <i class="ti ti-paperclip"></i>
+        <span style="flex:1">${f.name}</span>
+        ${sizeKb ? `<span style="font-size:10px;color:#555">${sizeKb}</span>` : ''}
+      </a>`;
+    }
     html += `</div>`;
   }
 
-  // All raw fields (collapsible)
-  const skip = new Set(['OR','MODELO','TALLER','ESTADO','FASE','OPERARIO','MATRICULA','MATRÍCULA',
-    'MARCA','MARCA/MODELO','PROPIETARIO','FECHA ENTRADA','FECHA PREVISTA ENTREGA','VIN','KM',
-    'LINK OR','LINK_OR','LINK CARPETA','LINK_CARPETA','LINK_CARPETA_DRIVE','LINK PERITACION',
-    'FOTO_ALBARAN','FOTO ALBARAN','BASTIDOR']);
-  const extras = Object.entries(raw).filter(([k,v]) => v && !skip.has(k));
+  // ── Archivada en Trello ────────────────────
+  if (card.closed) {
+    html += `<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;background:#111827;border:1px solid #374151;border-radius:7px;margin-bottom:8px">
+      <i class="ti ti-archive" style="color:#6b7280;font-size:14px"></i>
+      <div style="font-size:11px;color:#9ca3af">Esta tarjeta está <strong style="color:#d1d5db">archivada</strong> en Trello — expediente cerrado</div>
+    </div>`;
+  }
 
-  if (extras.length) {
-    html += `<div class="dp-section">
-      <div class="dp-section-title" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none'">
-        <i class="ti ti-dots"></i>Más campos <i class="ti ti-chevron-down" style="margin-left:auto;font-size:11px"></i>
+  // ── Fase actual (lista de Trello) ──────────
+  if (card._listName) {
+    html += `<div style="display:flex;align-items:center;gap:7px;padding:7px 10px;background:#0c1a3d;border:1px solid #1e3a8a;border-radius:8px;margin-bottom:8px">
+      <i class="ti ti-layout-kanban" style="color:#579dff;font-size:16px"></i>
+      <div>
+        <div style="font-size:9px;color:#3b82f6;text-transform:uppercase;letter-spacing:.4px">Fase actual en Trello</div>
+        <div style="font-size:13px;font-weight:700;color:#93c5fd">${card._listName}</div>
       </div>
-      <div class="dp-grid" style="display:none">`;
-    for (const [k,v] of extras) {
-      html += `<div class="dp-field"><div class="dp-field-label">${k}</div><div class="dp-field-val" style="font-size:11px">${v}</div></div>`;
+    </div>`;
+  }
+
+  // ── Etiquetas / Labels ─────────────────────
+  const labels = (card.labels||[]).filter(l => l.name);
+  if (labels.length) {
+    const colors = { green:'#14532d', yellow:'#78350f', orange:'#7c2d12', red:'#7f1d1d', purple:'#4c1d95', blue:'#1e3a8a', sky:'#0c4a6e', lime:'#14532d', pink:'#831843', black:'#1f2937' };
+    html += `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">`;
+    for (const lb of labels) {
+      const bg = colors[lb.color] || '#1f2937';
+      html += `<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;background:${bg};color:#e0e0e0">${lb.name}</span>`;
+    }
+    html += `</div>`;
+  }
+
+  // ── Descripción de la tarjeta (datos cliente) ──
+  if (card.desc && card.desc.trim()) {
+    html += `<div style="background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:9px 11px;margin-bottom:8px">
+      <div style="font-size:9px;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Descripción / Datos cliente</div>
+      <div style="font-size:11px;color:#ccc;white-space:pre-wrap;line-height:1.6">${card.desc.replace(/</g,'&lt;')}</div>
+    </div>`;
+  }
+
+  // ── Progreso checklists ────────────────────
+  const totalItems = card.checklists.reduce((a,cl) => a + cl.checkItems.length, 0);
+  const doneItems  = card.checklists.reduce((a,cl) => a + cl.checkItems.filter(i => i.state==='complete').length, 0);
+  const pct        = totalItems ? Math.round(doneItems/totalItems*100) : 0;
+
+  if (totalItems) {
+    html += `<div class="trello-stat">
+      <span class="ts-pill blue"><i class="ti ti-checklist" style="font-size:11px"></i> ${doneItems}/${totalItems} ítems</span>
+      <span class="ts-pill ${pct===100?'green':pct>50?'blue':'amber'}">${pct}% completado</span>
+      ${card.due ? `<span class="ts-pill ${card.dueComplete?'green':'amber'}"><i class="ti ti-calendar-due" style="font-size:11px"></i> ${fmtTrelloDate(card.due)}</span>` : ''}
+    </div>
+    <div class="cl-progress"><div class="cl-progress-bar" style="width:${pct}%"></div></div>`;
+  }
+
+  // ── Checklists ─────────────────────────────
+  for (const cl of card.checklists) {
+    if (!cl.checkItems.length) continue;
+    const clDone = cl.checkItems.filter(i => i.state==='complete').length;
+    html += `<div class="cl-block">
+      <div class="cl-name"><i class="ti ti-checklist"></i>${cl.name} <span style="color:#444;font-weight:400">(${clDone}/${cl.checkItems.length})</span></div>
+      <div class="cl-items">`;
+    for (const item of cl.checkItems.sort((a,b) => a.pos-b.pos)) {
+      const done = item.state === 'complete';
+      html += `<div class="cl-item${done?' done':''}">
+        <div class="cl-check"></div>
+        <div class="cl-item-text">${item.name}</div>
+      </div>`;
     }
     html += `</div></div>`;
   }
 
-  document.getElementById('dpBody').innerHTML = html;
-  document.getElementById('detailOverlay').classList.add('open');
+  // ── Comentarios ────────────────────────────
+  const comments = (card.actions||[]).filter(a => a.type==='commentCard').slice(0,5);
+  if (comments.length) {
+    html += `<div class="ds-title" style="margin-top:10px"><i class="ti ti-messages"></i>Comentarios recientes</div>
+    <div class="trello-comments">`;
+    for (const c of comments) {
+      html += `<div class="tc-item">
+        <div class="tc-meta">
+          <span class="tc-who"><i class="ti ti-user" style="font-size:10px"></i> ${c.memberCreator?.fullName||c.memberCreator?.username||'?'}</span>
+          <span class="tc-when">${fmtTrelloDate(c.date)}</span>
+        </div>
+        <div class="tc-text">${(c.data?.text||'').replace(/</g,'&lt;')}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  el.innerHTML = html;
 }
 
-function closeDetail(e) {
-  if (e && e.target !== document.getElementById('detailOverlay')) return;
-  document.getElementById('detailOverlay').classList.remove('open');
+async function loadTrelloSection(cardId) {
+  const el = document.getElementById('trello-section');
+  if (!el) return;
+  el.innerHTML = `<div class="trello-loading"><i class="ti ti-loader"></i>Cargando Trello…</div>`;
+  try {
+    const card = await fetchTrelloCard(cardId);
+    // Si la tarjeta está archivada en Trello → marcar el expediente como cerrado
+    if (card.closed && currentRaw) {
+      currentRaw._trelloClosed = true;
+      // Actualizar también en allExp para que el filtro lo refleje
+      const idx = allExp.findIndex(e => e === currentRaw || (
+        col(e,'MATRICULA','MATRÍCULA') === col(currentRaw,'MATRICULA','MATRÍCULA') &&
+        col(e,'OR','NUM OR','Nº OR') === col(currentRaw,'OR','NUM OR','Nº OR')
+      ));
+      if (idx !== -1) allExp[idx]._trelloClosed = true;
+    }
+    renderTrello(card);
+  } catch(e) {
+    el.innerHTML = `<div class="trello-err"><i class="ti ti-wifi-off" style="font-size:13px;margin-right:5px"></i>No se pudo cargar Trello: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  PASOS — MODAL + GUARDADO
+// ═══════════════════════════════════════════
+function openPasoModal() {
+  if (!accessToken) {
+    // Need to authenticate first, then open modal
+    if (OAUTH_CLIENT_ID.includes('TU_OAUTH')) {
+      showToast('Configura el OAuth Client ID primero', 'error', 4000); return;
+    }
+    if (!tokenClient) { initGIS(); setTimeout(openPasoModal, 600); return; }
+    // Request token, then open modal
+    tokenClient.requestAccessToken({ prompt: '' });
+    // Callback will call enterEditMode — we override that here temporarily
+    const orig = tokenClient._callback;
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: OAUTH_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
+      callback: async (resp) => {
+        if (resp.error) { showToast('Error Google: ' + resp.error, 'error'); return; }
+        accessToken = resp.access_token;
+        try {
+          const ui = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } });
+          const u = await ui.json();
+          currentUserEmail = u.email || null; currentUserName = u.name || u.email || null;
+        } catch(e) {}
+        openPasoModal();
+      }
+    });
+    tokenClient.requestAccessToken({ prompt: '' });
+    return;
+  }
+  // Populate tipo select
+  const sel = document.getElementById('pasoTipo');
+  sel.innerHTML = STEP_TYPES.map(s => `<option value="${s.key}">${s.label}</option>`).join('');
+  document.getElementById('pasoDesc').value = '';
+  document.getElementById('pasoLink').value = '';
+  // Show exp info bar
+  if (currentRaw) {
+    const mat    = col(currentRaw,'MATRICULA','MATRÍCULA');
+    const orN    = col(currentRaw,'OR','NUM OR','Nº OR','NÚMERO OR');
+    const marca  = col(currentRaw,'MARCA','MARCA VEHICULO','MARCA VEHÍCULO');
+    const modelo = col(currentRaw,'MODELO','MODELO VEHICULO','MODELO VEHÍCULO');
+    const taller = currentRaw._TALLER || '';
+    const infoEl = document.getElementById('pasoExpInfo');
+    if (infoEl) infoEl.innerHTML =
+      `<i class="ti ti-car" style="color:#cc0000;margin-right:6px"></i><strong style="color:#e5e5e5">${mat}</strong>` +
+      (orN    ? `<span style="margin:0 8px;color:#555">|</span><span style="color:#aaa">OR: <strong style="color:#e5e5e5">${orN}</strong></span>` : '') +
+      (marca||modelo ? `<span style="margin:0 8px;color:#555">|</span><span style="color:#aaa">${[marca,modelo].filter(Boolean).join(' ')}</span>` : '') +
+      (taller ? `<span style="margin:0 8px;color:#555">|</span><span style="color:#888">${taller}</span>` : '');
+  }
+  document.getElementById('pasoModal').classList.add('open');
+}
+
+function closePasoModal() {
+  document.getElementById('pasoModal').classList.remove('open');
+}
+
+async function savePaso() {
+  if (!accessToken) { showToast('Sin sesión Google', 'error'); return; }
+  const tipo  = document.getElementById('pasoTipo').value;
+  const desc  = document.getElementById('pasoDesc').value.trim();
+  const link  = document.getElementById('pasoLink').value.trim();
+  const mat   = col(currentRaw,'MATRICULA','MATRÍCULA') || '—';
+  const orNum = col(currentRaw,'OR','NUM OR','Nº OR') || '';
+  const taller= (col(currentRaw,'TALLER') || currentRaw._TALLER || '').toUpperCase();
+  const fecha = nowStamp();
+  const user  = currentUserEmail || 'desconocido';
+
+  const btn = document.getElementById('pasoSaveBtn');
+  btn.disabled = true;
+  showToast('Guardando paso…', 'loading');
+
+  // Row: MATRICULA | OR | FECHA | TIPO | DESCRIPCION | LINK | USUARIO | TALLER
+  const row = [mat, orNum, fecha, tipo, desc, link, user, taller];
+  const range = encodeURIComponent('PASOS!A:H');
+  const url   = `https://sheets.googleapis.com/v4/spreadsheets/${SID.EXP}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [row] }),
+    });
+    if (res.status === 401) {
+      accessToken = null; showToast('Sesión caducada', 'error'); btn.disabled = false; return;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    // Add to local allPasos immediately (no reload needed)
+    const st = STEP_TYPES.find(s => s.key === tipo);
+    allPasos.unshift({ MATRICULA:mat, OR:orNum, FECHA:fecha, TIPO:tipo, DESCRIPCION:desc, LINK:link, USUARIO:user, TALLER:taller });
+
+    closePasoModal();
+    showToast(`✓ Paso "${st?.label||tipo}" registrado`, 'success');
+    // Re-render detail to show new paso
+    openDetail(currentRaw, false);
+
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error', 5000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg, type='success', duration=2800) {
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  const icons = { success:'ti-circle-check', error:'ti-circle-x', loading:'ti-loader' };
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="ti ${icons[type]||icons.success}" style="font-size:16px"></i>${msg}`;
+  t.classList.add('show');
+  if (type !== 'loading') {
+    toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+  }
+}
+function hideToast() {
+  clearTimeout(toastTimer);
+  document.getElementById('toast').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════
+//  OAUTH / EDICIÓN
+// ═══════════════════════════════════════════
+function initGIS() {
+  if (!window.google || !window.google.accounts) {
+    // GIS not loaded yet — retry
+    setTimeout(initGIS, 500);
+    return;
+  }
+  if (OAUTH_CLIENT_ID.includes('TU_OAUTH')) return; // not configured yet
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: OAUTH_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    callback: async (resp) => {
+      hideToast();
+      if (resp.error) {
+        showToast('Error con Google: ' + resp.error, 'error');
+        return;
+      }
+      accessToken = resp.access_token;
+      // Get user info (email + name) for audit trail
+      try {
+        const ui = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const u = await ui.json();
+        currentUserEmail = u.email || null;
+        currentUserName  = u.name  || u.email || null;
+      } catch(e) { /* non-blocking */ }
+      enterEditMode();
+    }
+  });
+}
+
+function requestEdit() {
+  if (OAUTH_CLIENT_ID.includes('TU_OAUTH')) {
+    showToast('Configura el OAuth Client ID primero', 'error', 4000);
+    return;
+  }
+  if (!tokenClient) { showToast('Cargando Google…', 'loading'); initGIS(); setTimeout(requestEdit, 800); return; }
+  if (accessToken) { enterEditMode(); return; }
+  showToast('Conectando con Google…', 'loading');
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+function enterEditMode() {
+  isEditMode = true;
+  openDetail(currentRaw, true);
+  setTimeout(() => {
+    document.getElementById('dpBody').scrollTop = 0;
+  }, 50);
+}
+
+function cancelEdit() {
+  isEditMode = false;
+  openDetail(currentRaw, false);
+}
+
+// Convert column index (1-based) to letter(s): 1=A, 26=Z, 27=AA…
+function colLetter(n) {
+  let s = '';
+  while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+  return s;
+}
+
+function nowStamp() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+async function appendHistorial(mat, orNum, camposCambiados) {
+  // Append one row to a "HISTORIAL" tab (creates data even if tab doesn't exist yet)
+  const range    = encodeURIComponent(`HISTORIAL!A:F`);
+  const url      = `https://sheets.googleapis.com/v4/spreadsheets/${SID.EXP}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+  const row = [
+    nowStamp(),
+    currentUserEmail || 'desconocido',
+    currentUserName  || '',
+    mat,
+    orNum || '',
+    camposCambiados,
+  ];
+  await fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [row] }),
+  });
+  // Non-blocking — ignore errors silently
+}
+
+async function saveEdits() {
+  if (!accessToken) { showToast('Sin sesión Google', 'error'); return; }
+  if (!currentRaw || !currentRaw._rowIdx || !currentRaw._sheetTab) {
+    showToast('No se puede localizar la fila en el sheet', 'error'); return;
+  }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  showToast('Guardando…', 'loading');
+
+  // Collect edited values from all inputs/selects/textareas
+  const edits = {};
+  document.querySelectorAll('[data-field]').forEach(el => {
+    edits[el.dataset.field] = el.value.trim();
+  });
+
+  // ── Audit fields ──────────────────────────
+  const auditUser = currentUserEmail || 'desconocido';
+  const auditDate = nowStamp();
+  // Only write audit fields if those columns exist in the sheet
+  if (expHeaders.includes('MODIFICADO POR'))      edits['MODIFICADO POR']      = auditUser;
+  if (expHeaders.includes('FECHA MODIFICACION'))   edits['FECHA MODIFICACION']  = auditDate;
+  if (expHeaders.includes('MODIFICADO POR'))      edits['MODIFICADO POR']      = auditUser;
+
+  // Build human-readable list of changed fields for the historial log
+  const mat   = col(currentRaw,'MATRICULA','MATRÍCULA') || '—';
+  const orNum = col(currentRaw,'OR','NUM OR','Nº OR')   || '';
+  const changed = Object.entries(edits)
+    .filter(([k]) => !['MODIFICADO POR','FECHA MODIFICACION'].includes(k))
+    .filter(([k,v]) => (currentRaw[k]||'') !== v)
+    .map(([k,v]) => `${k}: "${currentRaw[k]||''}" → "${v}"`)
+    .join(' | ');
+
+  // Merge edits into raw data
+  const updatedRaw = { ...currentRaw, ...edits };
+
+  // Reconstruct full row array using the global expHeaders (column order)
+  const rowValues = expHeaders.map(h => updatedRaw[h] || '');
+
+  const sheetTab = currentRaw._sheetTab;
+  const rowIdx   = currentRaw._rowIdx;
+  const lastCol  = colLetter(expHeaders.length);
+  const range    = encodeURIComponent(`'${sheetTab}'!A${rowIdx}:${lastCol}${rowIdx}`);
+  const url      = `https://sheets.googleapis.com/v4/spreadsheets/${SID.EXP}/values/${range}?valueInputOption=USER_ENTERED`;
+
+  try {
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [rowValues] }),
+    });
+
+    if (res.status === 401) {
+      accessToken = null;
+      showToast('Sesión caducada, reconecta con Google', 'error');
+      tokenClient.requestAccessToken({ prompt: '' });
+      btn.disabled = false;
+      return;
+    }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    // ── Log to HISTORIAL tab (non-blocking) ──
+    if (changed) appendHistorial(mat, orNum, changed);
+
+    // Update local data
+    Object.assign(currentRaw, edits);
+    const idx = allExp.findIndex(r => r._rowIdx === currentRaw._rowIdx && r._sheetTab === currentRaw._sheetTab);
+    if (idx >= 0) Object.assign(allExp[idx], edits);
+
+    isEditMode = false;
+    const who = currentUserName || currentUserEmail || '';
+    showToast(`✓ Guardado${who ? ' por ' + who.split('@')[0] : ''}`, 'success');
+    openDetail(currentRaw, false);
+    renderList();
+
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error', 5000);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -677,6 +1870,27 @@ function extractTrelloId(url) {
 tallerFlt = detectParentTaller();
 setTaller(tallerFlt);   // update button styles immediately
 loadAll();
+// Init Google OAuth (non-blocking)
+window.addEventListener('load', initGIS);
+
+/*
+ ╔══════════════════════════════════════════════════════════════╗
+ ║  CONFIGURAR OAuth CLIENT ID — Hacer una sola vez            ║
+ ╠══════════════════════════════════════════════════════════════╣
+ ║  1. Ir a: https://console.cloud.google.com/                 ║
+ ║  2. Seleccionar el proyecto de la API key                   ║
+ ║  3. APIs & Services → Credentials → Create Credentials      ║
+ ║     → OAuth 2.0 Client ID                                   ║
+ ║  4. Tipo: Web application                                   ║
+ ║  5. Authorized JavaScript origins:                          ║
+ ║     https://grupomotorcar-maker.github.io                   ║
+ ║  6. Copiar el Client ID generado                            ║
+ ║  7. Pegar en OAUTH_CLIENT_ID arriba (línea 278)             ║
+ ║                                                             ║
+ ║  Las cuentas joanmotorcar / raulmotor ya tienen acceso      ║
+ ║  al sheet, así que el login será automático en sus PCs.     ║
+ ╚══════════════════════════════════════════════════════════════╝
+*/
 </script>
 </body>
 </html>
