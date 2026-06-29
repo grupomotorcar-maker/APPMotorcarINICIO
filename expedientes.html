@@ -1588,8 +1588,14 @@ function renderTrello(card) {
     </div>`;
   }
 
-  // ── Fase actual (lista de Trello) ──────────
+  // ── Fase actual (lista de Trello) → también actualiza FASE_TALLER ──
   if (card._listName) {
+    // Actualizar campo FASE en el panel de detalle y en el input de edición
+    const detFase = document.getElementById('detFase');
+    if (detFase) detFase.textContent = card._listName;
+    const inputFase = document.querySelector('[data-field="FASE_TALLER"]') || document.querySelector('[data-field="FASE TALLER"]');
+    if (inputFase && inputFase.tagName === 'INPUT') inputFase.value = card._listName;
+
     html += `<div style="display:flex;align-items:center;gap:7px;padding:7px 10px;background:#0c1a3d;border:1px solid #1e3a8a;border-radius:8px;margin-bottom:8px">
       <i class="ti ti-layout-kanban" style="color:#579dff;font-size:16px"></i>
       <div>
@@ -1597,6 +1603,19 @@ function renderTrello(card) {
         <div style="font-size:13px;font-weight:700;color:#93c5fd">${card._listName}</div>
       </div>
     </div>`;
+  }
+
+  // ── Due date de Trello → actualiza FECHA_COMPROMISO_ENTREGA ──
+  if (card.due) {
+    const dueD = new Date(card.due);
+    const dueStr = `${String(dueD.getDate()).padStart(2,'0')}/${String(dueD.getMonth()+1).padStart(2,'0')}/${dueD.getFullYear()}`;
+    // Solo actualizar si el panel no tiene ya una fecha de entrega del sheet
+    const detEntrega = document.getElementById('detFEntrega');
+    if (detEntrega && !detEntrega.textContent.trim()) {
+      detEntrega.textContent = dueStr;
+    }
+    const inputEntrega = document.querySelector('[data-field="FECHA_COMPROMISO_ENTREGA"]') || document.querySelector('[data-field="FECHA COMPROMISO ENTREGA"]');
+    if (inputEntrega && inputEntrega.tagName === 'INPUT' && !inputEntrega.value) inputEntrega.value = dueStr;
   }
 
   // ── Etiquetas / Labels ─────────────────────
