@@ -751,15 +751,19 @@ function tallerPill(t) {
   return `<span class="pill ${cls}">${t}</span>`;
 }
 
+window._listCache = [];   // índice seguro para onclick
+
 function renderList() {
   const items = getFiltered();
+  window._listCache = items;   // guardar referencia directa
   if (!items.length) {
     setListHTML(`<div class="empty"><i class="ti ti-folder-x"></i><p>Sin resultados con los filtros actuales</p></div>`);
     return;
   }
 
   let html = '';
-  for (const r of items) {
+  for (let _idx = 0; _idx < items.length; _idx++) {
+  const r = items[_idx];
     const mat    = col(r,'MATRICULA','MATRÍCULA') || '—';
     const modelo = col(r,'MODELO','MARCA','MARCA/MODELO','MARCA / MODELO','VEHICULO','VEHÍCULO') || '';
     const or     = col(r,'OR','NUM OR','Nº OR','NÚMERO OR','OR_NUM');
@@ -784,7 +788,7 @@ function renderList() {
     const cerradaReason = cerrada
       ? (r._trelloClosed ? 'Archivada en Trello' : 'Facturada / Cerrada')
       : '';
-    html += `<div class="exp-card${cerrada?' cerrada':''}" onclick='openDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>
+    html += `<div class="exp-card${cerrada?' cerrada':''}" onclick="openDetail(window._listCache[${_idx}])">
       <div class="exp-top">
         <div>
           <div class="exp-mat">${mat}</div>
@@ -871,6 +875,13 @@ function section(icon, title, content) {
 }
 
 function openDetail(rawArg, editModeOverride) {
+  try { _openDetail(rawArg, editModeOverride); }
+  catch(e) {
+    console.error('openDetail error:', e);
+    showToast('Error al abrir: ' + e.message, 'error', 6000);
+  }
+}
+function _openDetail(rawArg, editModeOverride) {
   const raw = typeof rawArg === 'string' ? JSON.parse(rawArg) : rawArg;
   // Store for save/cancel
   if (editModeOverride === undefined) {
